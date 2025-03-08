@@ -211,7 +211,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _predictedFood != null ? _getAdvice : null,
-              child: const Text("Get Advice"),
+              child: const Text("View Result"),
             ),
           ],
         ),

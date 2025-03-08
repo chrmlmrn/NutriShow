@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nutrishow/views/user_input.dart';
 
 class MacronutrientAdvicePage extends StatelessWidget {
   final Map<String, dynamic> foodDetails;
@@ -10,6 +11,19 @@ class MacronutrientAdvicePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(""),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              // Navigate back to UserInputView
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const UserInputView()),
+                    (route) => false, // Removes all previous routes
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -71,7 +85,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     Text(
-                      "Dietary Advice",
+                      "Dietary Assessment",
                       style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10),

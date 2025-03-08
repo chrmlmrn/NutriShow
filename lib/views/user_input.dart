@@ -225,12 +225,20 @@ class _UserInputScreenState extends State<UserInputScreen> {
               const SizedBox(height: 15),
               DropdownButtonFormField<String>(
                 value: _selectedActivityLevel,
-                items: _activityLevels
-                    .map((level) => DropdownMenuItem(
-                  value: level,
-                  child: Text(level),
-                ))
-                    .toList(),
+                isExpanded: true, // Expands the dropdown width to fit content
+                menuMaxHeight: 300, // Adjust height to fit all options
+                items: _activityLevels.map((level) {
+                  return DropdownMenuItem(
+                    value: level,
+                    child: SizedBox(
+                      width: double.infinity, // Ensures full width for text
+                      child: Text(
+                        level,
+                        softWrap: true, // Allows text to wrap into multiple lines
+                      ),
+                    ),
+                  );
+                }).toList(),
                 onChanged: (value) {
                   setState(() {
                     _selectedActivityLevel = value;
@@ -241,6 +249,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                   border: OutlineInputBorder(),
                 ),
               ),
+
               const SizedBox(height: 20),
               Center(
                 child: ElevatedButton(

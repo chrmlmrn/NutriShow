@@ -31,11 +31,11 @@ class _UserInputScreenState extends State<UserInputScreen> {
   bool _isKg = true;
 
   final List<String> _ageGroups = [
-    "10 to 12 years",
-    "13 to 15 years",
-    "16 to 18 years",
-    "19 to 29 years",
-    "30 to 49 years",
+    "10 to 12 years old",
+    "13 to 15 years old",
+    "16 to 18 years old",
+    "19 to 29 years old",
+    "30 to 49 years old",
   ];
 
   final List<String> _genders = ["Male", "Female"];

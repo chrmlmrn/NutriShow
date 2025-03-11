@@ -225,16 +225,16 @@ class _UserInputScreenState extends State<UserInputScreen> {
               const SizedBox(height: 15),
               DropdownButtonFormField<String>(
                 value: _selectedActivityLevel,
-                isExpanded: true, // Expands the dropdown width to fit content
-                menuMaxHeight: 300, // Adjust height to fit all options
+                isExpanded: true,
+                menuMaxHeight: 300,
                 items: _activityLevels.map((level) {
                   return DropdownMenuItem(
                     value: level,
                     child: SizedBox(
-                      width: double.infinity, // Ensures full width for text
+                      width: double.infinity,
                       child: Text(
                         level,
-                        softWrap: true, // Allows text to wrap into multiple lines
+                        softWrap: true,
                       ),
                     ),
                   );

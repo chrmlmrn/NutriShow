@@ -31,19 +31,27 @@ class _UserInputScreenState extends State<UserInputScreen> {
   bool _isKg = true;
 
   final List<String> _ageGroups = [
+    "0 to 5 months old",
+    "6 to 11 months old",
+    "1 to 2 years old",
+    "3 to 5 years old",
+    "6 to 9 years old",
     "10 to 12 years old",
     "13 to 15 years old",
     "16 to 18 years old",
     "19 to 29 years old",
     "30 to 49 years old",
+    "50 to 59 years old",
+    "60 to 69 years old",
+    "70 to 75 years old",
+    "75 above years old",
   ];
 
   final List<String> _genders = ["Male", "Female"];
   final List<String> _activityLevels = [
-    "Sedentary - Little to no physical activity, mostly sitting or lying down.",
-    "Lightly Active - Light exercise 1-3 days per week, such as casual walking or stretching.",
-    "Active - Moderate exercise 3-5 days per week, such as jogging, cycling, or gym workouts.",
-    "Very Active - Intense physical activity 6-7 days per week, including sports and strength training."
+    "Less than 30 min/day of moderate activity",
+    "30 to 60 min/day of moderate activity",
+    "More than 60 min/day of moderate activity",
   ];
 
   void _submitData() {

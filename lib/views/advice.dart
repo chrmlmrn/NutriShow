@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nutrishow/views/history.dart';
 import 'package:nutrishow/views/user_input.dart';
 
 class MacronutrientAdvicePage extends StatelessWidget {
@@ -13,13 +14,25 @@ class MacronutrientAdvicePage extends StatelessWidget {
         title: const Text(""),
         actions: [
           IconButton(
-            icon: const Icon(Icons.home),
+            icon: const Icon(Icons.history),
+            tooltip: 'History',
             onPressed: () {
-              // Navigate back to UserInputView
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FoodHistoryPage()),
+              );
+            },
+          ),
+
+          // Home Icon Button
+          IconButton(
+            icon: const Icon(Icons.home),
+            tooltip: 'Home',
+            onPressed: () {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const UserInputView()),
-                    (route) => false, // Removes all previous routes
+                    (route) => false,
               );
             },
           ),

@@ -39,6 +39,7 @@ dependencies:
   image: ^4.5.2
   path: ^1.9.0
   sqflite: ^2.4.1
+  shared_preferences: ^2.5.2
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +72,7 @@ flutter:
     - assets/mobilenetv2_food_classifier.tflite
     - assets/labels.txt
     - assets/nutrishow_db.db
+    - assets/thumb_MobileNetV2_v5.tflite
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

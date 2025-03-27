@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nutrishow/database/database_service.dart';
+import 'package:nutrishow/database/food_history.dart';
 import 'package:nutrishow/views/advice.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
@@ -17,24 +18,22 @@ class DishOptionsScreen extends StatefulWidget {
 class _DishOptionsScreenState extends State<DishOptionsScreen> {
   final ImagePicker _picker = ImagePicker();
   XFile? _image;
-  String? _predictedFood;
-  late Interpreter _interpreter;
+  String? _foodResult;
+  String? _thumbResult;
+  late Interpreter _foodInterpreter;
+  late Interpreter _thumbInterpreter;
   late List<String> _labels;
 
   @override
   void initState() {
     super.initState();
-    _loadModelAndLabels();
+    _loadModels();
   }
 
-  Future<void> _loadModelAndLabels() async {
-    try {
-      _interpreter = await Interpreter.fromAsset('assets/mobilenetv2_food_classifier.tflite');
-
-      _labels = await _loadLabels('assets/labels.txt');
-    } catch (e) {
-      _labels = [];
-    }
+  Future<void> _loadModels() async {
+    _foodInterpreter = await Interpreter.fromAsset('assets/mobilenetv2_food_classifier.tflite');
+    _thumbInterpreter = await Interpreter.fromAsset('assets/thumb_MobileNetV2_v5.tflite');
+    _labels = await _loadLabels('assets/labels.txt');
   }
 
   Future<List<String>> _loadLabels(String path) async {
@@ -56,11 +55,9 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       List.generate(224, (y) {
         return List.generate(224, (x) {
           final pixel = resizedImage.getPixelSafe(x, y);
-
           final r = pixel.r / 127.5 - 1.0;
           final g = pixel.g / 127.5 - 1.0;
           final b = pixel.b / 127.5 - 1.0;
-
           return [r, g, b];
         });
       })
@@ -69,7 +66,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     return inputTensor;
   }
 
-  Future<void> _predictFood() async {
+  Future<void> _runBothDetections() async {
     if (_image == null) return;
 
     try {
@@ -78,11 +75,17 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         throw Exception("Failed to preprocess image.");
       }
 
-      final output = List.filled(101, 0.0).reshape([1, 101]);
+      // Thumb detection
+      final thumbOutput = List.filled(1, 0.0).reshape([1, 1]);
+      _thumbInterpreter.run(input, thumbOutput);
+      bool isThumb = thumbOutput[0][0] > 0.99;
+      print('Raw thumb model output: ${thumbOutput[0][0]}');
 
-      _interpreter.run(input, output);
+      // Food classification
+      final foodOutput = List.filled(101, 0.0).reshape([1, 101]);
+      _foodInterpreter.run(input, foodOutput);
 
-      final predictions = output[0]
+      final predictions = foodOutput[0]
           .asMap()
           .entries
           .map((entry) => {'label': _labels[entry.key], 'confidence': entry.value})
@@ -90,25 +93,32 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         ..sort((a, b) => (b['confidence'] as double).compareTo(a['confidence'] as double));
 
       setState(() {
-        _predictedFood = '${predictions[0]["label"]} (${(predictions[0]["confidence"] * 100).toStringAsFixed(2)}%)';
+        _foodResult = '${predictions[0]["label"]} (${(predictions[0]["confidence"] * 100).toStringAsFixed(2)}%)';
+        _thumbResult = isThumb
+            ? 'Thumb detected (${(thumbOutput[0][0] * 100).toStringAsFixed(2)}%)'
+            : 'No thumb detected';
+
+        print(_thumbResult);
+
       });
     } catch (e) {
-      print("Error during prediction: $e");
+      print("Error during inference: $e");
       setState(() {
-        _predictedFood = "Error during prediction";
+        _foodResult = "Error during inference.";
+        _thumbResult = "Error during inference.";
       });
     }
   }
-
 
   Future<void> _takePhoto() async {
     final photo = await _picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
       setState(() {
         _image = photo;
-        _predictedFood = null;
+        _foodResult = null;
+        _thumbResult = null;
       });
-      await _predictFood();
+      await _runBothDetections();
     }
   }
 
@@ -117,25 +127,24 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     if (photo != null) {
       setState(() {
         _image = photo;
-        _predictedFood = null;
+        _foodResult = null;
+        _thumbResult = null;
       });
-      await _predictFood();
+      await _runBothDetections();
     }
   }
 
   Future<void> _getAdvice() async {
-    if (_predictedFood == null) return;
+    if (_foodResult == null) return;
 
-    String foodName = _predictedFood!.split(" (")[0].trim();
+    String foodName = _foodResult!.split(" (")[0].trim();
     print("Predicted Food Name: $foodName");
 
     DatabaseHelper dbHelper = DatabaseHelper();
-
     Map<String, dynamic>? foodDetails = await dbHelper.getFoodDetails(foodName);
 
-    print("Food Details Found Before Navigation: $foodDetails");
-
     if (foodDetails != null) {
+      await FoodHistory.addToHistory(foodDetails);
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -143,7 +152,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         ),
       );
     } else {
-      print("No nutritional data found for '$foodName'");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("No nutritional data found for '$foodName'")),
       );
@@ -152,7 +160,8 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
 
   @override
   void dispose() {
-    _interpreter.close();
+    _foodInterpreter.close();
+    _thumbInterpreter.close();
     super.dispose();
   }
 
@@ -166,7 +175,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // Image Display
             Container(
               height: 200,
               width: 200,
@@ -190,13 +198,15 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
             Text(
-              _predictedFood != null
-                  ? "Predicted Food: $_predictedFood"
-                  : "No prediction yet",
+              _foodResult ?? "",
               style: const TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _foodResult != null && !_foodResult!.contains("Error") ? _getAdvice : null,
+              child: const Text("View Result"),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -207,11 +217,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
             ElevatedButton(
               onPressed: _uploadDish,
               child: const Text("Upload a Dish"),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _predictedFood != null ? _getAdvice : null,
-              child: const Text("View Result"),
             ),
           ],
         ),

@@ -31,7 +31,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
   bool _isKg = true;
 
   final List<String> _ageGroups = [
-    "0 to 5 months old",
+    "1 to 5 months old",
     "6 to 11 months old",
     "1 to 2 years old",
     "3 to 5 years old",
@@ -44,7 +44,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
     "50 to 59 years old",
     "60 to 69 years old",
     "70 to 75 years old",
-    "75 above years old",
+    "75 years old above",
   ];
 
   final List<String> _genders = ["Male", "Female"];
@@ -81,6 +81,51 @@ class _UserInputScreenState extends State<UserInputScreen> {
           ],
         ),
       );
+    }
+  }
+
+  void _convertCmToFeetInches() {
+    final cmText = _heightCmController.text;
+    if (cmText.isNotEmpty) {
+      final cm = double.tryParse(cmText);
+      if (cm != null) {
+        final totalInches = cm / 2.54;
+        final feet = totalInches ~/ 12;
+        final inches = (totalInches % 12).round();
+        _heightFeetController.text = feet.toString();
+        _heightInchesController.text = inches.toString();
+      }
+    }
+  }
+
+  void _convertFeetInchesToCm() {
+    final feetText = _heightFeetController.text;
+    final inchesText = _heightInchesController.text;
+    final feet = double.tryParse(feetText) ?? 0;
+    final inches = double.tryParse(inchesText) ?? 0;
+    final cm = (feet * 12 + inches) * 2.54;
+    _heightCmController.text = cm.round().toString();
+  }
+
+  void _convertKgToLbs() {
+    final kgText = _weightController.text;
+    if (kgText.isNotEmpty) {
+      final kg = double.tryParse(kgText);
+      if (kg != null) {
+        final lbs = (kg * 2.20462).round();
+        _weightController.text = lbs.toString();
+      }
+    }
+  }
+
+  void _convertLbsToKg() {
+    final lbsText = _weightController.text;
+    if (lbsText.isNotEmpty) {
+      final lbs = double.tryParse(lbsText);
+      if (lbs != null) {
+        final kg = (lbs / 2.20462).round();
+        _weightController.text = kg.toString();
+      }
     }
   }
 
@@ -142,7 +187,12 @@ class _UserInputScreenState extends State<UserInputScreen> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => setState(() => _isKg = true),
+                      onPressed: () {
+                        setState(() {
+                          if (!_isKg) _convertLbsToKg();
+                          _isKg = true;
+                        });
+                      },
                       child: const Text("kg"),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _isKg ? Colors.grey : Colors.white,
@@ -152,7 +202,12 @@ class _UserInputScreenState extends State<UserInputScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => setState(() => _isKg = false),
+                      onPressed: () {
+                        setState(() {
+                          if (_isKg) _convertKgToLbs();
+                          _isKg = false;
+                        });
+                      },
                       child: const Text("lbs"),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: !_isKg ? Colors.grey : Colors.white,
@@ -176,7 +231,12 @@ class _UserInputScreenState extends State<UserInputScreen> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => setState(() => _isCm = true),
+                      onPressed: () {
+                        setState(() {
+                          _convertFeetInchesToCm();
+                          _isCm = true;
+                        });
+                      },
                       child: const Text("cm"),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _isCm ? Colors.grey : Colors.white,
@@ -186,7 +246,12 @@ class _UserInputScreenState extends State<UserInputScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => setState(() => _isCm = false),
+                      onPressed: () {
+                        setState(() {
+                          _convertCmToFeetInches();
+                          _isCm = false;
+                        });
+                      },
                       child: const Text("ft/in"),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: !_isCm ? Colors.grey : Colors.white,

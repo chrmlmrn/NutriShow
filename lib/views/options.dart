@@ -19,20 +19,17 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
   final ImagePicker _picker = ImagePicker();
   XFile? _image;
   String? _foodResult;
-  String? _thumbResult;
   late Interpreter _foodInterpreter;
-  late Interpreter _thumbInterpreter;
   late List<String> _labels;
 
   @override
   void initState() {
     super.initState();
-    _loadModels();
+    _loadModel();
   }
 
-  Future<void> _loadModels() async {
+  Future<void> _loadModel() async {
     _foodInterpreter = await Interpreter.fromAsset('assets/mobilenetv2_food_classifier.tflite');
-    _thumbInterpreter = await Interpreter.fromAsset('assets/thumb_MobileNetV2_v5.tflite');
     _labels = await _loadLabels('assets/labels.txt');
   }
 
@@ -66,7 +63,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     return inputTensor;
   }
 
-  Future<void> _runBothDetections() async {
+  Future<void> _runDetection() async {
     if (_image == null) return;
 
     try {
@@ -75,14 +72,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         throw Exception("Failed to preprocess image.");
       }
 
-      // Thumb detection
-      final thumbOutput = List.filled(1, 0.0).reshape([1, 1]);
-      _thumbInterpreter.run(input, thumbOutput);
-      bool isThumb = thumbOutput[0][0] > 0.99;
-      print('Raw thumb model output: ${thumbOutput[0][0]}');
-
-      // Food classification
-      final foodOutput = List.filled(101, 0.0).reshape([1, 101]);
+      final foodOutput = List.filled(80, 0.0).reshape([1, 80]);
       _foodInterpreter.run(input, foodOutput);
 
       final predictions = foodOutput[0]
@@ -94,18 +84,11 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
 
       setState(() {
         _foodResult = '${predictions[0]["label"]} (${(predictions[0]["confidence"] * 100).toStringAsFixed(2)}%)';
-        _thumbResult = isThumb
-            ? 'Thumb detected (${(thumbOutput[0][0] * 100).toStringAsFixed(2)}%)'
-            : 'No thumb detected';
-
-        print(_thumbResult);
-
       });
     } catch (e) {
       print("Error during inference: $e");
       setState(() {
         _foodResult = "Error during inference.";
-        _thumbResult = "Error during inference.";
       });
     }
   }
@@ -116,9 +99,8 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       setState(() {
         _image = photo;
         _foodResult = null;
-        _thumbResult = null;
       });
-      await _runBothDetections();
+      await _runDetection();
     }
   }
 
@@ -128,9 +110,8 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       setState(() {
         _image = photo;
         _foodResult = null;
-        _thumbResult = null;
       });
-      await _runBothDetections();
+      await _runDetection();
     }
   }
 
@@ -161,7 +142,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
   @override
   void dispose() {
     _foodInterpreter.close();
-    _thumbInterpreter.close();
     super.dispose();
   }
 

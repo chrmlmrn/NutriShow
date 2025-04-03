@@ -159,12 +159,12 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           size: 30,
         ),
         title:
-        Center(
-          child: Text(
-            'Dish Classification',
-            style: GoogleFonts.nunito(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
+          Center(
+            child: Text(
+              'Dish Classification',
+              style: GoogleFonts.nunito(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
+            ),
           ),
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.history),

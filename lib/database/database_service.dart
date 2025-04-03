@@ -13,7 +13,7 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDB() async {
-    String dbPath = join(await getDatabasesPath(), 'nutrishow_db.db');
+    String dbPath = join(await getDatabasesPath(), 'nutrishow_data.db');
 
     bool dbExists = await databaseExists(dbPath);
     if (dbExists) {
@@ -22,7 +22,7 @@ class DatabaseHelper {
     }
 
     print("Copying new database from assets...");
-    ByteData data = await rootBundle.load('assets/nutrishow_db.db');
+    ByteData data = await rootBundle.load('assets/nutrishow_data.db');
     List<int> bytes = data.buffer.asUint8List();
     await File(dbPath).writeAsBytes(bytes, flush: true);
 

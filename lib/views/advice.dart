@@ -7,9 +7,34 @@ class MacronutrientAdvicePage extends StatelessWidget {
   final Map<String, dynamic>? assessment;
   final Map<String, dynamic>? recommendedIntake;
   final String? gender;
+  final String? portionSize;
 
+  const MacronutrientAdvicePage({super.key, required this.foodDetails, this.assessment, this.recommendedIntake, this.gender, this.portionSize});
 
-  const MacronutrientAdvicePage({super.key, required this.foodDetails, this.assessment, this.recommendedIntake, this.gender});
+  double _adjustForPortion(dynamic value) {
+    // Ensure the value is a double
+    double nutrientValue = double.tryParse(value.toString()) ?? 0.0; // Ensure it's a valid double
+
+    // If portion size is "1" or valid, return the value as is
+    if (portionSize == null || portionSize == "1") {
+      return nutrientValue;
+    }
+
+    // Handle fractional values like "1/2"
+    if (portionSize!.contains("/")) {
+      final parts = portionSize!.split("/");
+      if (parts.length == 2) {
+        double numerator = double.tryParse(parts[0]) ?? 1;
+        double denominator = double.tryParse(parts[1]) ?? 1;
+        return nutrientValue * (numerator / denominator);
+      }
+    }
+
+    // Otherwise, treat it as a regular number
+    double portionMultiplier = double.tryParse(portionSize!) ?? 1;
+    return nutrientValue * portionMultiplier;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -56,32 +81,32 @@ class MacronutrientAdvicePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeaderRow("🔥 Calories", "${foodDetails['energy_kcal'] ?? 'Unknown'} kcal"),
+                    _buildHeaderRow("🔥 Calories", "${_adjustForPortion(foodDetails['energy_kcal'] ?? 0)} kcal"),
                     SizedBox(height: 10),
-                    _buildNutrientRow("🍗 Protein", foodDetails['protein_g'], "g"),
-                    _buildNutrientRow("🍞 Total Carbohydrates", foodDetails['carbohydrates_g'], "g"),
-                    _buildSubNutrient("🌿 Fiber", foodDetails['fiber_g'], "g"),
-                    _buildSubNutrient("🍬 Total Sugars", foodDetails['total_sugars_g'], "g"),
-                    _buildNutrientRow("🥑 Total Fats", foodDetails['total_fat_g'], "g"),
+                    _buildNutrientRow("🍗 Protein", _adjustForPortion(foodDetails['protein_g'] ?? 0), "g"),
+                    _buildNutrientRow("🍞 Total Carbohydrates", _adjustForPortion(foodDetails['carbohydrates_g'] ?? 0), "g"),
+                    _buildSubNutrient("🌿 Fiber", _adjustForPortion(foodDetails['fiber_g'] ?? 0), "g"),
+                    _buildSubNutrient("🍬 Total Sugars", _adjustForPortion(foodDetails['total_sugars_g'] ?? 0), "g"),
+                    _buildNutrientRow("🥑 Total Fats", _adjustForPortion(foodDetails['total_fat_g'] ?? 0), "g"),
 
                     Divider(thickness: 1.5, color: Colors.black26),
 
                     _buildCategoryHeader("Minerals"),
-                    _buildNutrientRow("🧂 Sodium", foodDetails['sodium_mg'], "mg"),
-                    _buildNutrientRow("🥛 Calcium", foodDetails['calcium_mg'], "mg"),
-                    _buildNutrientRow("🩸 Iron", foodDetails['iron_mg'], "mg"),
-                    _buildNutrientRow("🍌 Potassium", foodDetails['potassium_mg'], "mg"),
-                    _buildNutrientRow("⚡ Zinc", foodDetails['zinc_mg'], "mg"),
+                    _buildNutrientRow("🧂 Sodium", _adjustForPortion(foodDetails['sodium_mg'] ?? 0), "mg"),
+                    _buildNutrientRow("🥛 Calcium", _adjustForPortion(foodDetails['calcium_mg'] ?? 0), "mg"),
+                    _buildNutrientRow("🩸 Iron", _adjustForPortion(foodDetails['iron_mg'] ?? 0), "mg"),
+                    _buildNutrientRow("🍌 Potassium", _adjustForPortion(foodDetails['potassium_mg'] ?? 0), "mg"),
+                    _buildNutrientRow("⚡ Zinc", _adjustForPortion(foodDetails['zinc_mg'] ?? 0), "mg"),
 
                     Divider(thickness: 1.5, color: Colors.black26),
 
                     _buildCategoryHeader("Vitamins"),
-                    _buildNutrientRow("🍃 Folate", foodDetails['folate_ug'], "mcg"),
-                    _buildNutrientRow("🍊 Vitamin C", foodDetails['vitamin_c_mg'], "mg"),
-                    _buildNutrientRow("🥩 Vitamin B-6", foodDetails['vitamin_b6_mg'], "mg"),
-                    _buildNutrientRow("👀 Vitamin A", foodDetails['vitamin_a_ug'], "mcg"),
-                    _buildNutrientRow("🥜 Vitamin E", foodDetails['vitamin_e_mg'], "mg"),
-                    _buildNutrientRow("🥬 Vitamin K", foodDetails['vitamin_k_ug'], "mcg"),
+                    _buildNutrientRow("🍃 Folate", _adjustForPortion(foodDetails['folate_ug'] ?? 0), "mcg"),
+                    _buildNutrientRow("🍊 Vitamin C", _adjustForPortion(foodDetails['vitamin_c_mg'] ?? 0), "mg"),
+                    _buildNutrientRow("🥩 Vitamin B-6", _adjustForPortion(foodDetails['vitamin_b6_mg'] ?? 0), "mg"),
+                    _buildNutrientRow("👀 Vitamin A", _adjustForPortion(foodDetails['vitamin_a_ug'] ?? 0), "mcg"),
+                    _buildNutrientRow("🥜 Vitamin E", _adjustForPortion(foodDetails['vitamin_e_mg'] ?? 0), "mg"),
+                    _buildNutrientRow("🥬 Vitamin K", _adjustForPortion(foodDetails['vitamin_k_ug'] ?? 0), "mcg"),
                   ],
                 ),
               ),
@@ -316,6 +341,4 @@ class MacronutrientAdvicePage extends StatelessWidget {
       );
     }).toList();
   }
-
-
 }

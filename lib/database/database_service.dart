@@ -6,12 +6,14 @@ import 'package:path/path.dart';
 class DatabaseHelper {
   static Database? _database;
 
+  // Database initialization and connection
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDB();
     return _database!;
   }
 
+  // Initialize the database from assets
   Future<Database> _initDB() async {
     String dbPath = join(await getDatabasesPath(), 'nutrishow_data.db');
 
@@ -30,12 +32,15 @@ class DatabaseHelper {
     return await openDatabase(dbPath);
   }
 
+  // Get food details for a given food name
   Future<Map<String, dynamic>?> getFoodDetails(String foodName) async {
     final db = await database;
 
+    // Query to get all food servings (for debugging purposes)
     List<Map<String, dynamic>> allServings = await db.rawQuery("SELECT * FROM food_servings");
     print("All Food Servings in Flutter: $allServings");
 
+    // Query to join food_items and food_servings to get details for the provided food name
     List<Map<String, dynamic>> results = await db.rawQuery(
       '''
       SELECT fi.food_name, fs.*
@@ -48,15 +53,18 @@ class DatabaseHelper {
 
     print("Query Results: $results");
 
+    // Return the first result or null if no results found
     return results.isNotEmpty ? results.first : null;
   }
 
+  // Get recommended nutrient intake for a specific age
   Future<Map<String, dynamic>> getRecommendedIntakeRow(int age) async {
     final db = await database;
     final result = await db.query('user_recommended_nutrient_intake', where: 'age = ?', whereArgs: [age]);
     return result.isNotEmpty ? result.first : {};
   }
 
+  // Assess the diet based on food data and recommended intake
   Map<String, dynamic> assessDiet({
     required Map<String, dynamic> foodData,
     required Map<String, dynamic> recommendedRow,
@@ -117,6 +125,33 @@ class DatabaseHelper {
       "too_much": tooMuch,
     };
   }
+
+  Future<String> queryPortionType(String foodId) async {
+    final db = await database;
+
+    // Query the portion type for the foodId (e.g., 'nf_001')
+    var result = await db.rawQuery(
+      '''
+    SELECT portion
+    FROM food_servings
+    WHERE food_uid = ?
+    ''',
+      [foodId],
+    );
+
+    // Debug: Print the result of the query
+    print("Query result for foodId ($foodId): $result");
+
+    // Check if the result is not empty and return the portion
+    if (result.isNotEmpty && result.first['portion'] != null) {
+      return result.first['portion'] as String;
+    } else {
+      throw Exception("Portion not found for food ID: $foodId");
+    }
+  }
+
+
+
 }
 
 extension StringExtension on String {

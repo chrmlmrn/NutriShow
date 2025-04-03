@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nutrishow/database/food_history.dart';
@@ -47,6 +46,15 @@ class FoodHistoryPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final item = history[index];
 
+              // Retrieve the portion size and adjust the values accordingly
+              double portionSize = double.tryParse(item['portion_size']?.toString() ?? '1') ?? 1;
+
+              // Adjust the nutritional values based on portion size
+              double calories = (item['energy_kcal'] ?? 0) * portionSize;
+              double protein = (item['protein_g'] ?? 0) * portionSize;
+              double carbs = (item['carbohydrates_g'] ?? 0) * portionSize;
+              double fat = (item['total_fat_g'] ?? 0) * portionSize;
+
               return Container(
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 child: Card(
@@ -90,10 +98,10 @@ class FoodHistoryPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 6),
-                            Text("Calories: ${item['energy_kcal'] ?? 'Unknown'} kcal", style: GoogleFonts.nunito(fontSize:15)),
-                            Text("Protein: ${item['protein_g'] ?? 'Unknown'} g", style: GoogleFonts.nunito(fontSize:15)),
-                            Text("Carbs: ${item['carbohydrates_g'] ?? 'Unknown'} g", style: GoogleFonts.nunito(fontSize:15)),
-                            Text("Fat: ${item['total_fat_g'] ?? 'Unknown'} g", style: GoogleFonts.nunito(fontSize:15)),
+                            Text("Calories: ${calories.toStringAsFixed(2)} kcal", style: GoogleFonts.nunito(fontSize:15)),
+                            Text("Protein: ${protein.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
+                            Text("Carbs: ${carbs.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
+                            Text("Fat: ${fat.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
                           ],
                         ),
                         trailing: Icon(

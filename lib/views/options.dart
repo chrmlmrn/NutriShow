@@ -21,6 +21,8 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
   final ImagePicker _picker = ImagePicker();
   XFile? _image;
   String? _foodResult;
+  String? _portionSize;
+  String? _foodId;
   late Interpreter _foodInterpreter;
   late List<String> _labels;
 
@@ -84,9 +86,16 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           .toList()
         ..sort((a, b) => (b['confidence'] as double).compareTo(a['confidence'] as double));
 
+      String foodName = predictions[0]["label"];
       setState(() {
-        _foodResult = '${predictions[0]["label"]} (${(predictions[0]["confidence"] * 100).toStringAsFixed(2)}%)';
+        _foodResult = '$foodName (${(predictions[0]["confidence"] * 100).toStringAsFixed(2)}%)';
+        _foodId = foodName; // Store the food name or map it to the food ID
       });
+
+      // Fetch the portion type after the food detection
+      String portionType = await _getPortionTypeFromDatabase(foodName);
+      print("Portion type: $portionType");
+
     } catch (e) {
       print("Error during inference: $e");
       setState(() {
@@ -95,12 +104,16 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     }
   }
 
+
+
   Future<void> _takePhoto() async {
     final photo = await _picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
       setState(() {
         _image = photo;
         _foodResult = null;
+        _portionSize = null;
+        _foodId = null;
       });
       await _runDetection();
     }
@@ -112,10 +125,111 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       setState(() {
         _image = photo;
         _foodResult = null;
+        _portionSize = null;
+        _foodId = null;
       });
       await _runDetection();
     }
   }
+
+  Future<void> _showPortionInputDialog() async {
+    if (_foodId == null) {
+      // If no food ID is detected, don't show the dialog
+      return;
+    }
+
+    TextEditingController _controller = TextEditingController();
+
+    // Get the portion type for the detected food
+    String portionType = await _getPortionTypeFromDatabase(_foodId!);
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Enter Portion Size"),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Portion type: $portionType"), // Display the portion type here
+              TextField(
+                controller: _controller,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                  hintText: "e.g. 1 or 1/2",
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () => Navigator.pop(context),
+            ),
+            ElevatedButton(
+              child: const Text("OK"),
+              onPressed: () {
+                setState(() {
+                  _portionSize = _controller.text;
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  // This method will query the database to get the portion type for the given foodId
+  Future<String> _getPortionTypeFromDatabase(String foodName) async {
+    DatabaseHelper dbHelper = DatabaseHelper();
+
+    try {
+      // Step 1: Fetch the food_uid from the food_items table using food_name
+      final db = await dbHelper.database; // Get the database instance
+      var foodIdResult = await db.rawQuery(
+        '''
+      SELECT food_uid
+      FROM food_items
+      WHERE LOWER(food_name) = ?
+      ''',
+        [foodName.trim().toLowerCase()],
+      );
+
+      // Debug: Log the foodId
+      print("Food UID for $foodName: $foodIdResult");
+
+      if (foodIdResult.isNotEmpty) {
+        String foodUid = foodIdResult.first['food_uid'] as String;
+
+        // Step 2: Query the portion type from the food_servings table using the food_uid
+        var result = await db.rawQuery(
+          '''
+        SELECT portion
+        FROM food_servings
+        WHERE food_uid = ?
+        ''',
+          [foodUid],
+        );
+
+        // Check if the result is not empty and return the portion
+        if (result.isNotEmpty && result.first['portion'] != null) {
+          return result.first['portion'] as String;
+        } else {
+          throw Exception("Portion not found for food UID: $foodUid");
+        }
+      } else {
+        throw Exception("Food UID not found for food name: $foodName");
+      }
+    } catch (e) {
+      print("Error fetching portion type: $e");
+      return 'Unknown';  // Fallback if an error occurs
+    }
+  }
+
 
 
   Future<void> _getAdvice() async {
@@ -128,10 +242,9 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     Map<String, dynamic>? foodDetails = await dbHelper.getFoodDetails(foodName);
 
     if (foodDetails != null) {
-      // TODO: Replace with actual user input values
-      int userAge = 25; // <-- You should get this from user input screen
-      String userGender = "Male"; // or "Female"
-      String userActivity = "Moderately Active"; // match the dropdown string
+      int userAge = 25;
+      String userGender = "Male";
+      String userActivity = "Moderately Active";
 
       Map<String, dynamic> recommendedRow = await dbHelper.getRecommendedIntakeRow(userAge);
 
@@ -141,11 +254,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         gender: userGender,
         activity: userActivity,
       );
-
-      print("Lacking nutrients (${assessment['lacking'].length}): ${assessment['lacking']}");
-      print("Too much nutrients (${assessment['too_much'].length}): ${assessment['too_much']}");
-
-
 
       await FoodHistory.addToHistory(foodDetails);
 
@@ -157,6 +265,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
             assessment: assessment,
             recommendedIntake: recommendedRow,
             gender: userGender,
+            portionSize: _portionSize,
           ),
         ),
       );
@@ -166,7 +275,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       );
     }
   }
-
 
   @override
   void dispose() {
@@ -184,13 +292,12 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           color: Color(0xFF0E4A06),
           size: 30,
         ),
-        title:
-          Center(
-            child: Text(
-              'Dish Classification',
-              style: GoogleFonts.nunito(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
-            ),
+        title: Center(
+          child: Text(
+            'Dish Classification',
+            style: GoogleFonts.nunito(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
           ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
@@ -204,34 +311,35 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           ),
         ],
       ),
-      body: Align(
-        alignment: Alignment.topCenter, // Centers content horizontally but keeps it at the top
-        child: Padding(
-          padding: const EdgeInsets.only(top: 65), // Adjust the top spacing
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(top: 65, left: 20, right: 20, bottom: 30),
           child: Column(
-            mainAxisSize: MainAxisSize.min, // Keeps the column from taking full height
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Container(
-                height: 250,
-                width: 250,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Color(0xFF0E4A06), width: 2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: _image != null
-                    ? ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.file(
-                    File(_image!.path),
-                    fit: BoxFit.cover,
+              Align(
+                alignment: Alignment.center, // Center the image container
+                child: Container(
+                  height: 250,
+                  width: 250,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Color(0xFF0E4A06), width: 2),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                )
-                    : const Center(
-                  child: Text(
-                    "No image selected",
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  child: _image != null
+                      ? ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(
+                      File(_image!.path),
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                      : const Center(
+                    child: Text(
+                      "No image selected",
+                      style: TextStyle(fontSize: 16, color: Colors.black54),
+                    ),
                   ),
                 ),
               ),
@@ -242,11 +350,14 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                   textAlign: TextAlign.center,
                 ),
+              if (_portionSize != null)
+                Text(
+                  "Portion: $_portionSize",
+                  style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black54),
+                ),
               const SizedBox(height: 45),
-              Wrap(
-                spacing: 20,
-                runSpacing: 10,
-                alignment: WrapAlignment.center,
+              Column(
+                mainAxisSize: MainAxisSize.min, // Ensure all buttons stack up and are centered
                 children: [
                   ElevatedButton.icon(
                     onPressed: _takePhoto,
@@ -258,6 +369,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                       foregroundColor: Color(0xFFF4FFC3),
                     ),
                   ),
+                  const SizedBox(height: 10),
                   ElevatedButton.icon(
                     onPressed: _uploadDish,
                     icon: const Icon(Icons.upload),
@@ -268,33 +380,37 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                       foregroundColor: Color(0xFFF4FFC3),
                     ),
                   ),
-                  Column(
-                    children: [
-                      const SizedBox(height: 25),
-                      ElevatedButton.icon(
-                        onPressed: _foodResult != null && !_foodResult!.contains("Error") ? _getAdvice : null,
-                        icon: const Icon(Icons.insights),
-                        label: const Text("View Result"),
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 65, vertical: 14),
-                          backgroundColor: Color(0xFF5D8736),
-                          foregroundColor: Color(0xFFF4FFC3),
-                        ),
+                  const SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: _foodId != null ? _showPortionInputDialog : null, // Only allow showing dialog if foodId is set
+                    icon: const Icon(Icons.edit),
+                    label: const Text("Enter Portion"),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                      backgroundColor: Color(0xFF5D8736),
+                      foregroundColor: Color(0xFFF4FFC3),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: _foodResult != null && !_foodResult!.contains("Error") ? _getAdvice : null,
+                    icon: const Icon(Icons.insights),
+                    label: const Text("View Result"),
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                    ],
+                      padding: const EdgeInsets.symmetric(horizontal: 65, vertical: 14),
+                      backgroundColor: Color(0xFF5D8736),
+                      foregroundColor: Color(0xFFF4FFC3),
+                    ),
                   ),
                 ],
               ),
-
             ],
           ),
         ),
       ),
     );
   }
-
-
 }

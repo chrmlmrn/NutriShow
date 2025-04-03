@@ -40,6 +40,7 @@ dependencies:
   path: ^1.9.0
   sqflite: ^2.4.1
   shared_preferences: ^2.5.2
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
@@ -71,8 +72,10 @@ flutter:
   assets:
     - assets/mobilenetv2_food_classifier.tflite
     - assets/labels.txt
-    - assets/nutrishow_db.db
+    - assets/nutrishow_data.db
     - assets/thumb_MobileNetV2_v5.tflite
+    - assets/logo.png
+    - assets/background.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -85,17 +88,30 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
+  #fonts:
+  #  - family: Poppins
+  #    fonts:
+  #      - asset: fonts/Poppins-ExtraLightItalic.ttf
+  #      - asset: fonts/Poppins-Italic.ttf
+  #      - asset: fonts/Poppins-Light.ttf
+  #      - asset: fonts/Poppins-LightItalic.ttf
+  #      - asset: fonts/Poppins-Medium.ttf
+  #      - asset: fonts/Poppins-MediumItalic.ttf
+  #      - asset: fonts/Poppins-Regular.ttf
+  #      - asset: fonts/Poppins-SemiBold.ttf
+  #      - asset: fonts/Poppins-SemiBoldItalic.ttf
+  #      - asset: fonts/Poppins-Thin.ttf
+  #      - asset: fonts/Poppins-ThinItalic.ttf
+  #  - family: Nunito
+  #    fonts:
+  #      - asset: fonts/Nunito-Italic-VariableFont_wght.ttf
+  #        weight: 600
+  #      - asset: fonts/Nunito-VariableFont_wght.ttf
+  #        weight: 900
+  #  - family: Changa One
+  #    fonts:
+  #      - asset: fonts/ChangaOne-Regular.ttf
+  #      - asset: fonts/ChangaOne-Italic.ttf
+
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nutrishow/views/history.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nutrishow/views/user_input.dart';
 
 class MacronutrientAdvicePage extends StatelessWidget {
@@ -10,23 +10,19 @@ class MacronutrientAdvicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF9FEEB),
       appBar: AppBar(
-        title: const Text(""),
+        backgroundColor: Color(0xFFF9FEEB),
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Color(0xFF0E4A06), size: 30),
+        title: Text(
+          'Dietary Assessment',
+          style: GoogleFonts.nunito(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.history),
-            tooltip: 'History',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FoodHistoryPage()),
-              );
-            },
-          ),
-
-          // Home Icon Button
-          IconButton(
-            icon: const Icon(Icons.home),
+            icon: Icon(Icons.home_rounded),
             tooltip: 'Home',
             onPressed: () {
               Navigator.pushAndRemoveUntil(
@@ -42,82 +38,58 @@ class MacronutrientAdvicePage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black, width: 2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              _buildNutritionFactsCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      decoration: BoxDecoration(
-                        border: Border(bottom: BorderSide(width: 3, color: Colors.black)),
-                      ),
-                      child: Text(
-                        "Calories ${foodDetails['calories'] ?? 'Unknown'}",
-                        style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
+                    _buildHeaderRow("🔥 Calories", "${foodDetails['energy_kcal'] ?? 'Unknown'} kcal"),
+                    SizedBox(height: 10),
+                    _buildNutrientRow("🍗 Protein", foodDetails['protein_g'], "g"),
+                    _buildNutrientRow("🍞 Total Carbohydrates", foodDetails['carbohydrates_g'], "g"),
+                    _buildSubNutrient("🌿 Fiber", foodDetails['fiber_g'], "g"),
+                    _buildSubNutrient("🍬 Total Sugars", foodDetails['total_sugars_g'], "g"),
+                    _buildNutrientRow("🥑 Total Fats", foodDetails['total_fat_g'], "g"),
 
-                    _buildNutrientRow("Total Fat", foodDetails['total_fat'], "g", bold: true),
-                    _buildSubNutrient("Saturated Fat", foodDetails['saturated_fat'], "g"),
-                    _buildSubNutrient("Polyunsaturated Fat", foodDetails['polyunsaturated_fat'], "g"),
-                    _buildSubNutrient("Monounsaturated Fat", foodDetails['monounsaturated_fat'], "g"),
-                    _buildNutrientRow("Cholesterol", foodDetails['cholesterol'], "mg"),
-                    _buildNutrientRow("Sodium", foodDetails['sodium'], "mg"),
-                    _buildNutrientRow("Total Carbohydrates", foodDetails['total_carbohydrates'], "g", bold: true),
-                    _buildSubNutrient("Dietary Fiber", foodDetails['dietary_fiber'], "g"),
-                    _buildSubNutrient("Sugar", foodDetails['sugar'], "g"),
-                    _buildNutrientRow("Protein", foodDetails['protein'], "g", bold: true),
-                    const Divider(thickness: 2, color: Colors.black),
+                    Divider(thickness: 1.5, color: Colors.black26),
 
-                    _buildNutrientRow("Vitamin D", foodDetails['vitamin_d'], "mcg"),
-                    _buildNutrientRow("Calcium", foodDetails['calcium'], "mg"),
-                    _buildNutrientRow("Iron", foodDetails['iron'], "mg"),
-                    _buildNutrientRow("Potassium", foodDetails['potassium'], "mg"),
+                    _buildCategoryHeader("Minerals"),
+                    _buildNutrientRow("🧂 Sodium", foodDetails['sodium_mg'], "mg"),
+                    _buildNutrientRow("🥛 Calcium", foodDetails['calcium_mg'], "mg"),
+                    _buildNutrientRow("🩸 Iron", foodDetails['iron_mg'], "mg"),
+                    _buildNutrientRow("🍌 Potassium", foodDetails['potassium_mg'], "mg"),
+                    _buildNutrientRow("⚡ Zinc", foodDetails['zinc_mg'], "mg"),
+
+                    Divider(thickness: 1.5, color: Colors.black26),
+
+                    _buildCategoryHeader("Vitamins"),
+                    _buildNutrientRow("🍃 Folate", foodDetails['folate_ug'], "mcg"),
+                    _buildNutrientRow("🍊 Vitamin C", foodDetails['vitamin_c_mg'], "mg"),
+                    _buildNutrientRow("🥩 Vitamin B-6", foodDetails['vitamin_b6_mg'], "mg"),
+                    _buildNutrientRow("👀 Vitamin A", foodDetails['vitamin_a_ug'], "mcg"),
+                    _buildNutrientRow("🥜 Vitamin E", foodDetails['vitamin_e_mg'], "mg"),
+                    _buildNutrientRow("🥬 Vitamin K", foodDetails['vitamin_k_ug'], "mcg"),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.lightBlueAccent.withOpacity(0.2),
-                  border: Border.all(color: Colors.blue, width: 2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              SizedBox(height: 20),
+              _buildDietaryAdviceCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      "Dietary Assessment",
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      "📝 Dietary Advice",
+                        style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF4A6FA5),
+                      ),
                     ),
                     SizedBox(height: 10),
-                    Text(
-                      "- Eat a balanced diet rich in vegetables and lean proteins.",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Text(
-                      "- Reduce intake of saturated fats and sugars to maintain heart health.",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Text(
-                      "- Ensure adequate fiber intake to aid digestion.",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Text(
-                      "- Drink plenty of water throughout the day.",
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    _buildTip("Eat a balanced diet with veggies and lean protein."),
+                    _buildTip("Reduce sugary drinks and junk food."),
+                    _buildTip("Drink enough water daily 💧."),
+                    _buildTip("Exercise regularly for better metabolism! 🏃‍♀️"),
                   ],
                 ),
               ),
@@ -128,25 +100,92 @@ class MacronutrientAdvicePage extends StatelessWidget {
     );
   }
 
-  Widget _buildNutrientRow(String name, dynamic value, String unit, {bool bold = false}) {
+  Widget _buildNutritionFactsCard({required Widget child, Color? color, Color borderColor = const Color(0xFFA9C46C)}) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 5,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildDietaryAdviceCard({required Widget child, Color? color, Color borderColor = const Color(0xFF23649e)}) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Color(0XFFCFE3DA),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 5,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildHeaderRow(String title, String value) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color:  Color(0xFFFFDA5C),
+      ),
+      child: Center(
+        child: Text(
+          "$title: $value",
+          style: GoogleFonts.poppins(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF68662A),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.only(top: 20.0, bottom: 8.0),
+      child: Text(
+        title,
+        style: GoogleFonts.nunito(
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF0E4A06),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNutrientRow(String name, dynamic value, String unit) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             name,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-            ),
+            style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.w500),
           ),
           Text(
             "${value ?? 'Unknown'} $unit",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-            ),
+            style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.blueGrey),
           ),
         ],
       ),
@@ -161,11 +200,29 @@ class MacronutrientAdvicePage extends StatelessWidget {
         children: [
           Text(
             name,
-            style: const TextStyle(fontSize: 16),
+            style: GoogleFonts.nunito(fontSize: 16, fontStyle: FontStyle.italic),
           ),
           Text(
             "${value ?? 'Unknown'} $unit",
-            style: const TextStyle(fontSize: 16),
+            style: GoogleFonts.nunito(fontSize: 16, color: Colors.blueGrey),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTip(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        children: [
+          Icon(Icons.check_circle, color: Colors.green, size: 20),
+          SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              text,
+              style: GoogleFonts.nunito(fontSize: 16),
+            ),
           ),
         ],
       ),

@@ -5,7 +5,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:nutrishow/database/database_service.dart';
 import 'package:nutrishow/database/food_history.dart';
 import 'package:nutrishow/views/advice.dart';
+import 'package:nutrishow/views/history.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image/image.dart' as img;
 
 class DishOptionsScreen extends StatefulWidget {
@@ -19,20 +21,17 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
   final ImagePicker _picker = ImagePicker();
   XFile? _image;
   String? _foodResult;
-  String? _thumbResult;
   late Interpreter _foodInterpreter;
-  late Interpreter _thumbInterpreter;
   late List<String> _labels;
 
   @override
   void initState() {
     super.initState();
-    _loadModels();
+    _loadModel();
   }
 
-  Future<void> _loadModels() async {
+  Future<void> _loadModel() async {
     _foodInterpreter = await Interpreter.fromAsset('assets/mobilenetv2_food_classifier.tflite');
-    _thumbInterpreter = await Interpreter.fromAsset('assets/thumb_MobileNetV2_v5.tflite');
     _labels = await _loadLabels('assets/labels.txt');
   }
 
@@ -66,7 +65,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     return inputTensor;
   }
 
-  Future<void> _runBothDetections() async {
+  Future<void> _runDetection() async {
     if (_image == null) return;
 
     try {
@@ -75,14 +74,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         throw Exception("Failed to preprocess image.");
       }
 
-      // Thumb detection
-      final thumbOutput = List.filled(1, 0.0).reshape([1, 1]);
-      _thumbInterpreter.run(input, thumbOutput);
-      bool isThumb = thumbOutput[0][0] > 0.99;
-      print('Raw thumb model output: ${thumbOutput[0][0]}');
-
-      // Food classification
-      final foodOutput = List.filled(101, 0.0).reshape([1, 101]);
+      final foodOutput = List.filled(80, 0.0).reshape([1, 80]);
       _foodInterpreter.run(input, foodOutput);
 
       final predictions = foodOutput[0]
@@ -94,18 +86,11 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
 
       setState(() {
         _foodResult = '${predictions[0]["label"]} (${(predictions[0]["confidence"] * 100).toStringAsFixed(2)}%)';
-        _thumbResult = isThumb
-            ? 'Thumb detected (${(thumbOutput[0][0] * 100).toStringAsFixed(2)}%)'
-            : 'No thumb detected';
-
-        print(_thumbResult);
-
       });
     } catch (e) {
       print("Error during inference: $e");
       setState(() {
         _foodResult = "Error during inference.";
-        _thumbResult = "Error during inference.";
       });
     }
   }
@@ -116,9 +101,8 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       setState(() {
         _image = photo;
         _foodResult = null;
-        _thumbResult = null;
       });
-      await _runBothDetections();
+      await _runDetection();
     }
   }
 
@@ -128,11 +112,11 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       setState(() {
         _image = photo;
         _foodResult = null;
-        _thumbResult = null;
       });
-      await _runBothDetections();
+      await _runDetection();
     }
   }
+
 
   Future<void> _getAdvice() async {
     if (_foodResult == null) return;
@@ -161,66 +145,130 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
   @override
   void dispose() {
     _foodInterpreter.close();
-    _thumbInterpreter.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF9FEEB),
       appBar: AppBar(
-        title: const Text(''),
+        backgroundColor: Color(0xFFF9FEEB),
+        iconTheme: IconThemeData(
+          color: Color(0xFF0E4A06),
+          size: 30,
+        ),
+        title:
+          Center(
+            child: Text(
+              'Dish Classification',
+              style: GoogleFonts.nunito(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
+            ),
+          ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: 'History',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FoodHistoryPage()),
+              );
+            },
+          ),
+        ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              height: 200,
-              width: 200,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: _image != null
-                  ? ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.file(
-                  File(_image!.path),
-                  fit: BoxFit.cover,
+      body: Align(
+        alignment: Alignment.topCenter, // Centers content horizontally but keeps it at the top
+        child: Padding(
+          padding: const EdgeInsets.only(top: 65), // Adjust the top spacing
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Keeps the column from taking full height
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                height: 250,
+                width: 250,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Color(0xFF0E4A06), width: 2),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              )
-                  : const Center(
-                child: Text(
-                  "No image selected",
-                  style: TextStyle(color: Colors.grey),
+                child: _image != null
+                    ? ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.file(
+                    File(_image!.path),
+                    fit: BoxFit.cover,
+                  ),
+                )
+                    : const Center(
+                  child: Text(
+                    "No image selected",
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              _foodResult ?? "",
-              style: const TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _foodResult != null && !_foodResult!.contains("Error") ? _getAdvice : null,
-              child: const Text("View Result"),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _takePhoto,
-              child: const Text("Take a Photo of a Dish"),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _uploadDish,
-              child: const Text("Upload a Dish"),
-            ),
-          ],
+              const SizedBox(height: 25),
+              if (_foodResult != null)
+                Text(
+                  _foodResult!,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                  textAlign: TextAlign.center,
+                ),
+              const SizedBox(height: 45),
+              Wrap(
+                spacing: 20,
+                runSpacing: 10,
+                alignment: WrapAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _takePhoto,
+                    icon: const Icon(Icons.camera_alt),
+                    label: const Text("Take a Photo"),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+                      backgroundColor: Color(0xFF5D8736),
+                      foregroundColor: Color(0xFFF4FFC3),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: _uploadDish,
+                    icon: const Icon(Icons.upload),
+                    label: const Text("Upload from Gallery"),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 33, vertical: 14),
+                      backgroundColor: Color(0xFF5D8736),
+                      foregroundColor: Color(0xFFF4FFC3),
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      const SizedBox(height: 25),
+                      ElevatedButton.icon(
+                        onPressed: _foodResult != null && !_foodResult!.contains("Error") ? _getAdvice : null,
+                        icon: const Icon(Icons.insights),
+                        label: const Text("View Result"),
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 65, vertical: 14),
+                          backgroundColor: Color(0xFF5D8736),
+                          foregroundColor: Color(0xFFF4FFC3),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+            ],
+          ),
         ),
       ),
     );
   }
+
+
 }

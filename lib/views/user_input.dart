@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'options.dart';
 
 class UserInputView extends StatelessWidget {
@@ -20,7 +21,7 @@ class UserInputScreen extends StatefulWidget {
 }
 
 class _UserInputScreenState extends State<UserInputScreen> {
-  String? _selectedAgeGroup;
+  final _ageController = TextEditingController();
   String? _selectedGender;
   String? _selectedActivityLevel;
   final _heightCmController = TextEditingController();
@@ -30,35 +31,65 @@ class _UserInputScreenState extends State<UserInputScreen> {
   bool _isCm = true;
   bool _isKg = true;
 
-  final List<String> _ageGroups = [
-    "0 to 5 months old",
-    "6 to 11 months old",
-    "1 to 2 years old",
-    "3 to 5 years old",
-    "6 to 9 years old",
-    "10 to 12 years old",
-    "13 to 15 years old",
-    "16 to 18 years old",
-    "19 to 29 years old",
-    "30 to 49 years old",
-    "50 to 59 years old",
-    "60 to 69 years old",
-    "70 to 75 years old",
-    "75 above years old",
-  ];
-
   final List<String> _genders = ["Male", "Female"];
-  final List<String> _activityLevels = [
-    "Less than 30 min/day of moderate activity",
-    "30 to 60 min/day of moderate activity",
-    "More than 60 min/day of moderate activity",
-  ];
+
+  final Map<String, String> _activityLevelsWithDescriptions = {
+    "Sedentary": "Light physical activity involved with everyday living",
+    "Moderately Active": "Physical activities equal to walking about 1.5 to 3 miles per day at 3 to 4 miles per hour, in addition to the light activities of daily living",
+    "Active": "Physical activities equal to walking more than 3 miles per day at 3 to 4 miles per hour, in addition to the light activities of daily living",
+  };
+
+  void _convertWeight() {
+    if (_weightController.text.isNotEmpty) {
+      double weight = double.tryParse(_weightController.text) ?? 0;
+      if (_isKg) {
+        _weightController.text = (weight / 2.20462).toStringAsFixed(2);
+      } else {
+        _weightController.text = (weight * 2.20462).toStringAsFixed(2);
+      }
+    }
+  }
+
+  void _convertHeight() {
+    if (_isCm) {
+      if (_heightFeetController.text.isNotEmpty || _heightInchesController.text.isNotEmpty) {
+        int feet = int.tryParse(_heightFeetController.text) ?? 0;
+        int inches = int.tryParse(_heightInchesController.text) ?? 0;
+        double totalInches = (feet * 12).toDouble() + inches; // Explicit conversion
+        double cm = totalInches * 2.54;
+        _heightCmController.text = cm.toStringAsFixed(2);
+      }
+    } else {
+      if (_heightCmController.text.isNotEmpty) {
+        double cm = double.tryParse(_heightCmController.text) ?? 0;
+        double totalInches = cm / 2.54;
+        int feet = (totalInches ~/ 12);
+        int inches = (totalInches % 12).toInt();
+        _heightFeetController.text = feet.toString();
+        _heightInchesController.text = inches.toString();
+      }
+    }
+  }
+
+  void _toggleWeightUnit(int index) {
+    setState(() {
+      _isKg = index == 0;
+      _convertWeight();
+    });
+  }
+
+  void _toggleHeightUnit(int index) {
+    setState(() {
+      _isCm = index == 0;
+      _convertHeight();
+    });
+  }
 
   void _submitData() {
     final heightText = _isCm ? _heightCmController.text : _heightFeetController.text;
     final weightText = _weightController.text;
 
-    if (_selectedAgeGroup != null &&
+    if (_ageController.text.isNotEmpty &&
         _selectedGender != null &&
         _selectedActivityLevel != null &&
         heightText.isNotEmpty &&
@@ -87,186 +118,272 @@ class _UserInputScreenState extends State<UserInputScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const Text(
-                'Enter Your Details',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      backgroundColor: Color(0xFFF9FEEB),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            const SizedBox(height: 60),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/logo.png',
+                  height: 70,
+                ),
+                const SizedBox(width: 15),
+                Text(
+                  'NutriShow',
+                  style: GoogleFonts.changaOne(
+                    fontSize: 50,
+                    color: Color(0xFF0E4A06), // Adjust color to fit your theme
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 60),
+            Text(
+              'User Metrics',
+              style: GoogleFonts.nunito(
+                fontSize: 34.5,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF0E4A06),
               ),
-              const SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                value: _selectedAgeGroup,
-                items: _ageGroups
-                    .map((ageGroup) => DropdownMenuItem(
-                  value: ageGroup,
-                  child: Text(ageGroup),
-                ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedAgeGroup = value;
-                  });
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Age',
-                  border: OutlineInputBorder(),
+            ),
+            const SizedBox(height: 30),
+            TextField(
+              controller: _ageController,
+              keyboardType: TextInputType.number, // Allows only numeric input
+              decoration: InputDecoration(
+                labelText: 'Age',
+                labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
                 ),
               ),
-              const SizedBox(height: 15),
-              DropdownButtonFormField<String>(
-                value: _selectedGender,
-                items: _genders
-                    .map((gender) => DropdownMenuItem(
-                  value: gender,
-                  child: Text(gender),
-                ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedGender = value;
-                  });
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Gender',
-                  border: OutlineInputBorder(),
+            ),
+            const SizedBox(height: 28),
+            DropdownButtonFormField<String>(
+              value: _selectedGender,
+              items: _genders
+                  .map((gender) => DropdownMenuItem(
+                value: gender,
+                child: Text(gender),
+              ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedGender = value;
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Gender',
+                labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
                 ),
               ),
-              const SizedBox(height: 15),
-              const Text("Weight", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => setState(() => _isKg = true),
-                      child: const Text("kg"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _isKg ? Colors.grey : Colors.white,
+            ),
+            const SizedBox(height: 28),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _weightController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: _isKg ? 'Weight (kg)' : 'Weight (lbs)',
+                      labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => setState(() => _isKg = false),
-                      child: const Text("lbs"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: !_isKg ? Colors.grey : Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _weightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: _isKg ? 'Weight (kg)' : 'Weight (lbs)',
-                  border: const OutlineInputBorder(),
                 ),
-              ),
-              const SizedBox(height: 15),
-              const Text("Height", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => setState(() => _isCm = true),
-                      child: const Text("cm"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _isCm ? Colors.grey : Colors.white,
-                      ),
+                const SizedBox(width: 8),
+                ToggleButtons(
+                  isSelected: [_isKg, !_isKg],
+                  onPressed: _toggleWeightUnit,
+                  borderRadius: BorderRadius.circular(5), // Makes it rounder
+                  selectedBorderColor: Color(0xFF0E4A06), // Border color when selected
+                  borderColor: Color(0xFFAAD3C4), // Border color when unselected
+                  fillColor: Color(0xFFABCB4D), // Background color when selected
+                  selectedColor: Color(0xFF0E4A06), // Text color when selected
+                  color: Colors.black, // Text color when unselected
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text("kg"),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => setState(() => _isCm = false),
-                      child: const Text("ft/in"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: !_isCm ? Colors.grey : Colors.white,
-                      ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text("lbs"),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              _isCm
-                  ? TextField(
-                controller: _heightCmController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Height (cm)',
-                  border: OutlineInputBorder(),
-                ),
-              )
-                  : Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _heightFeetController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Feet',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      controller: _heightInchesController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Inches',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              DropdownButtonFormField<String>(
-                value: _selectedActivityLevel,
-                isExpanded: true,
-                menuMaxHeight: 300,
-                items: _activityLevels.map((level) {
-                  return DropdownMenuItem(
-                    value: level,
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                        level,
-                        softWrap: true,
-                      ),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedActivityLevel = value;
-                  });
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Activity Level',
-                  border: OutlineInputBorder(),
-                ),
-              ),
+                  ],
 
-              const SizedBox(height: 20),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _submitData,
-                  child: const Text("Submit"),
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+            Row(
+              children: [
+                Expanded(
+                  child: _isCm
+                      ? TextField(
+                    controller: _heightCmController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Height (cm)',
+                      labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2), // Border when focused
+                      ),
+                    ),
+                  )
+                      : Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _heightFeetController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Feet',
+                            labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5),
+                              borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5),
+                              borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2), // Border when focused
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _heightInchesController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Inches',
+                            labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5),
+                              borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5),
+                              borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2), // Border when focused
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ToggleButtons(
+                  isSelected: [_isCm, !_isCm],
+                  onPressed: _toggleHeightUnit,
+                  borderRadius: BorderRadius.circular(5), // Makes it rounder
+                  selectedBorderColor: Color(0xFF0E4A06), // Border color when selected
+                  borderColor: Color(0xFFAAD3C4), // Border color when unselected
+                  fillColor: Color(0xFFABCB4D), // Background color when selected
+                  selectedColor: Color(0xFF0E4A06), // Text color when selected
+                  color: Colors.black, // Text color when unselected
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text("cm"),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text("ft/in"),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+            DropdownButtonFormField<String>(
+              value: _selectedActivityLevel,
+              isExpanded: true,
+              menuMaxHeight: 300,
+              items: _activityLevelsWithDescriptions.entries.map((entry) {
+                return DropdownMenuItem(
+                  value: entry.key,
+                  child: ListTile(
+                    title: Text(entry.key), // Show only the title in the dropdown list
+                    subtitle: Text(entry.value), // Show subtitle inside the dropdown
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedActivityLevel = value;
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Activity Level',
+                labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
                 ),
               ),
-            ],
-          ),
+              selectedItemBuilder: (context) => _activityLevelsWithDescriptions.keys.map((title) {
+                return Text(
+                  title, // Only display the main title in the dropdown button (prevents overflow)
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 16),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 40),
+            Center(
+              child: ElevatedButton(
+                onPressed: _submitData,
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 65, vertical: 14),
+                  backgroundColor: Color(0xFF5D8736),
+                  foregroundColor: Color(0xFFF4FFC3),
+                ),
+                child: Text(
+                  "Submit",
+                  style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

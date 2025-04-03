@@ -86,34 +86,93 @@ class _UserInputScreenState extends State<UserInputScreen> {
   }
 
   void _submitData() {
-    final heightText = _isCm ? _heightCmController.text : _heightFeetController.text;
     final weightText = _weightController.text;
+    double? heightCm;
+
+    if (_isCm) {
+      heightCm = double.tryParse(_heightCmController.text);
+    } else {
+      int feet = int.tryParse(_heightFeetController.text) ?? 0;
+      int inches = int.tryParse(_heightInchesController.text) ?? 0;
+      double totalInches = ((feet * 12) + inches).toDouble(); // Fixed!
+      heightCm = totalInches * 2.54;
+    }
 
     if (_ageController.text.isNotEmpty &&
         _selectedGender != null &&
         _selectedActivityLevel != null &&
-        heightText.isNotEmpty &&
+        heightCm != null &&
         weightText.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const DishOptionsScreen()),
-      );
+
+      double weightKg = _isKg
+          ? double.tryParse(weightText) ?? 0
+          : (double.tryParse(weightText) ?? 0) / 2.20462;
+
+      double heightMeters = heightCm / 100;
+
+      if (heightMeters <= 0 || weightKg <= 0) {
+        _showErrorDialog("Invalid height or weight values.");
+        return;
+      }
+
+      double bmi = weightKg / (heightMeters * heightMeters);
+      String category;
+
+      if (bmi < 18.5) {
+        category = "Underweight";
+      } else if (bmi < 25) {
+        category = "Healthy Weight";
+      } else if (bmi < 30) {
+        category = "Overweight";
+      } else {
+        category = "Obese";
+      }
+
+      if (category == "Healthy Weight") {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("BMI Status"),
+            content: Text("Your BMI is ${bmi.toStringAsFixed(2)}.\nYou are in the Healthy Weight range."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DishOptionsScreen()),
+                  );
+                },
+                child: const Text("Continue"),
+              ),
+            ],
+          ),
+        );
+      } else {
+        _showErrorDialog("Your BMI is ${bmi.toStringAsFixed(2)}.\nYou are in the $category range.\nOnly users in the Healthy Weight range can proceed.");
+      }
     } else {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Input Required"),
-          content: const Text("Please fill in all the fields to proceed."),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK"),
-            ),
-          ],
-        ),
-      );
+      _showErrorDialog("Please fill in all the fields to proceed.");
     }
   }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Notice"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {

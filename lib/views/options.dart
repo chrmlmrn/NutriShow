@@ -128,11 +128,36 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     Map<String, dynamic>? foodDetails = await dbHelper.getFoodDetails(foodName);
 
     if (foodDetails != null) {
+      // TODO: Replace with actual user input values
+      int userAge = 25; // <-- You should get this from user input screen
+      String userGender = "Male"; // or "Female"
+      String userActivity = "Moderately Active"; // match the dropdown string
+
+      Map<String, dynamic> recommendedRow = await dbHelper.getRecommendedIntakeRow(userAge);
+
+      Map<String, dynamic> assessment = dbHelper.assessDiet(
+        foodData: foodDetails,
+        recommendedRow: recommendedRow,
+        gender: userGender,
+        activity: userActivity,
+      );
+
+      print("Lacking nutrients (${assessment['lacking'].length}): ${assessment['lacking']}");
+      print("Too much nutrients (${assessment['too_much'].length}): ${assessment['too_much']}");
+
+
+
       await FoodHistory.addToHistory(foodDetails);
+
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MacronutrientAdvicePage(foodDetails: foodDetails),
+          builder: (context) => MacronutrientAdvicePage(
+            foodDetails: foodDetails,
+            assessment: assessment,
+            recommendedIntake: recommendedRow,
+            gender: userGender,
+          ),
         ),
       );
     } else {
@@ -141,6 +166,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       );
     }
   }
+
 
   @override
   void dispose() {

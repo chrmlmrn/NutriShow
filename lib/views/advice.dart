@@ -164,7 +164,18 @@ class MacronutrientAdvicePage extends StatelessWidget {
                     const SizedBox(height: 4),
 
                     if (recommendedIntake != null)
-                      ..._buildRecommendedIntakeList(recommendedIntake!)
+                      ...[
+                        ..._buildRecommendedIntakeList(recommendedIntake!),
+                        const SizedBox(height: 12),
+                        Text(
+                          "📌 Make necessary dietary changes by limiting overconsumed nutrients and increasing those that are lacking.",
+                          style: GoogleFonts.nunito(
+                            fontSize: 16,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ]
                     else
                       Text("• Not available", style: GoogleFonts.nunito(fontSize: 16)),
                   ],

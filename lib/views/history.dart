@@ -46,14 +46,19 @@ class FoodHistoryPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final item = history[index];
 
-              // Retrieve the portion size and adjust the values accordingly
-              double portionSize = double.tryParse(item['portion_size']?.toString() ?? '1') ?? 1;
+              // Extract stored structure
+              final foodDetails = item['foodDetails'] ?? {};
+              final assessment = item['assessment'];
+              final recommendedIntake = item['recommendedIntake'];
+              final gender = item['gender'];
+              final portionSize = double.tryParse(item['portionSize']?.toString() ?? '1') ?? 1;
 
-              // Adjust the nutritional values based on portion size
-              double calories = (item['energy_kcal'] ?? 0) * portionSize;
-              double protein = (item['protein_g'] ?? 0) * portionSize;
-              double carbs = (item['carbohydrates_g'] ?? 0) * portionSize;
-              double fat = (item['total_fat_g'] ?? 0) * portionSize;
+              // Adjust nutritional values using portion size
+              double calories = (foodDetails['energy_kcal'] ?? 0) * portionSize;
+              double protein = (foodDetails['protein_g'] ?? 0) * portionSize;
+              double carbs = (foodDetails['carbohydrates_g'] ?? 0) * portionSize;
+              double fat = (foodDetails['total_fat_g'] ?? 0) * portionSize;
+
 
               return Container(
                 margin: const EdgeInsets.symmetric(vertical: 8),
@@ -87,7 +92,7 @@ class FoodHistoryPage extends StatelessWidget {
                           ),
                         ),
                         title: Text(
-                          item['food_name'] ?? "Unknown Dish",
+                          foodDetails['food_name'] ?? "Unknown Dish",
                           style: GoogleFonts.poppins(
                             fontSize: 21,
                             fontWeight: FontWeight.w600,
@@ -113,7 +118,13 @@ class FoodHistoryPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => MacronutrientAdvicePage(foodDetails: item),
+                              builder: (_) => MacronutrientAdvicePage(
+                              foodDetails: foodDetails,
+                              assessment: assessment,
+                              recommendedIntake: recommendedIntake,
+                              gender: gender,
+                              portionSize: item['portionSize'],
+                            ),
                             ),
                           );
                         },

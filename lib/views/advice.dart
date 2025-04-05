@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nutrishow/views/user_input.dart';
+import 'dart:math';
 
 class MacronutrientAdvicePage extends StatelessWidget {
   final Map<String, dynamic> foodDetails;
@@ -38,6 +39,31 @@ class MacronutrientAdvicePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final adjustedFoodDetails = {
+      for (final entry in foodDetails.entries)
+        entry.key: entry.value is num ? _adjustForPortion(entry.value) : entry.value,
+    };
+
+    final List<String> _dietTips = [
+      "Please make sure to cut the nutrient intake for those with too much and consume more for those lacking/less.",
+      "Make necessary dietary changes by limiting overconsumed nutrients and increasing those that are lacking.",
+      "Improve your nutrient balance by eating less of what’s excessive and more of what’s insufficient.",
+      "Moderate your nutrient levels—reduce excesses and supplement deficiencies accordingly.",
+      "Ensure proper nutrition by decreasing overconsumed nutrients and boosting underconsumed ones.",
+      "Regulate your diet by lowering excessive nutrients and increasing those in short supply.",
+      "Optimize your nutrient intake by consuming less of what’s excessive and more of what’s insufficient.",
+      "Maintain a healthy balance by reducing nutrients that exceed recommendations and increasing those that fall short.",
+      "Keep your nutrient intake in check by lowering what’s too much and adding what’s too little.",
+      "Ensure a well-rounded diet by consuming less of what you have too much of and more of what you need.",
+      "Correct imbalances in your diet by lowering high nutrient levels and raising low ones.",
+      "Manage your nutrition by reducing excessive intake and boosting nutrients that are below recommended levels.",
+      "Strive for a balanced diet by cutting down on overconsumed nutrients and replenishing deficiencies.",
+      "Adjust your food choices to decrease excess nutrients and increase those that are lacking.",
+      "Make dietary adjustments by limiting excess nutrients and incorporating more of the ones you’re missing.",
+    ];
+
+    final String _randomTip = _dietTips[Random().nextInt(_dietTips.length)];
+
     return Scaffold(
       backgroundColor: Color(0xFFF9FEEB),
       appBar: AppBar(
@@ -69,13 +95,27 @@ class MacronutrientAdvicePage extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                foodDetails['food_name']?.toString().toUpperCase() ?? "Unknown Food",
+                foodDetails['food_name']?.toString().toUpperCase() ?? "UNKNOWN FOOD",
                 style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF0E4A06),
                 ),
               ),
+              if (portionSize != null &&
+                  portionSize!.isNotEmpty &&
+                  foodDetails['serving_size'] != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6.0),
+                  child: Text(
+                    "Portion Size: $portionSize serving(s) • ${_calculateTotalGrams()} grams",
+                    style: GoogleFonts.nunito(
+                      fontSize: 16,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 12),
               _buildNutritionFactsCard(
                 child: Column(
@@ -168,7 +208,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
                         ..._buildRecommendedIntakeList(recommendedIntake!),
                         const SizedBox(height: 12),
                         Text(
-                          "📌 Make necessary dietary changes by limiting overconsumed nutrients and increasing those that are lacking.",
+                          "📌 $_randomTip",
                           style: GoogleFonts.nunito(
                             fontSize: 16,
                             fontStyle: FontStyle.italic,
@@ -273,8 +313,8 @@ class MacronutrientAdvicePage extends StatelessWidget {
             style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.w500),
           ),
           Text(
-            "${value ?? 'Unknown'} $unit",
-            style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.blueGrey),
+              "${(value as num?)?.toStringAsFixed(3) ?? 'Unknown'} $unit",
+              style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.blueGrey),
           ),
         ],
       ),
@@ -292,7 +332,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
             style: GoogleFonts.nunito(fontSize: 16, fontStyle: FontStyle.italic),
           ),
           Text(
-            "${value ?? 'Unknown'} $unit",
+            "${(value as num?)?.toStringAsFixed(3) ?? 'Unknown'} $unit",
             style: GoogleFonts.nunito(fontSize: 16, color: Colors.blueGrey),
           ),
         ],
@@ -352,4 +392,25 @@ class MacronutrientAdvicePage extends StatelessWidget {
       );
     }).toList();
   }
+
+  String _calculateTotalGrams() {
+    final baseServing = double.tryParse(foodDetails['serving_size'].toString()) ?? 0;
+    double multiplier = 1.0;
+
+    if (portionSize != null) {
+      if (portionSize!.contains("/")) {
+        final parts = portionSize!.split("/");
+        if (parts.length == 2) {
+          double numerator = double.tryParse(parts[0]) ?? 1;
+          double denominator = double.tryParse(parts[1]) ?? 1;
+          multiplier = numerator / denominator;
+        }
+      } else {
+        multiplier = double.tryParse(portionSize!) ?? 1.0;
+      }
+    }
+
+    return (baseServing * multiplier).toStringAsFixed(1);
+  }
+
 }

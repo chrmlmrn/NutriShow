@@ -64,12 +64,12 @@ class DatabaseHelper {
     return result.isNotEmpty ? result.first : {};
   }
 
-  // Assess the diet based on food data and recommended intake
   Map<String, dynamic> assessDiet({
     required Map<String, dynamic> foodData,
     required Map<String, dynamic> recommendedRow,
     required String gender,
     required String activity,
+    String? portionSize,  // <-- new parameter
   }) {
     String g = gender.toLowerCase().startsWith("m") ? "m" : "f";
     String a = activity.toLowerCase().contains("sedentary")
@@ -98,6 +98,20 @@ class DatabaseHelper {
       "Potassium": ["potassium_mg", "potassium", "mg"],
     };
 
+    double multiplier = 1.0;
+    if (portionSize != null && portionSize.isNotEmpty) {
+      if (portionSize.contains("/")) {
+        final parts = portionSize.split("/");
+        if (parts.length == 2) {
+          final numerator = double.tryParse(parts[0]) ?? 1;
+          final denominator = double.tryParse(parts[1]) ?? 1;
+          multiplier = numerator / denominator;
+        }
+      } else {
+        multiplier = double.tryParse(portionSize) ?? 1;
+      }
+    }
+
     List<String> lacking = [];
     List<String> tooMuch = [];
 
@@ -108,6 +122,9 @@ class DatabaseHelper {
 
       double foodVal = double.tryParse("${foodData[foodKey]}".replaceAll("<", "").trim()) ?? 0;
       double recVal = double.tryParse("${recommendedRow[recKey]}".replaceAll("<", "").trim()) ?? 0;
+
+      // ✅ Adjust for portion
+      foodVal *= multiplier;
 
       if (recVal <= 0) return;
 
@@ -125,6 +142,7 @@ class DatabaseHelper {
       "too_much": tooMuch,
     };
   }
+
 
   Future<String> queryPortionType(String foodId) async {
     final db = await database;

@@ -4,16 +4,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 class FoodHistory {
   static const _key = 'food_history';
 
-  // Save food details to history
-  static Future<void> addToHistory(Map<String, dynamic> foodDetails) async {
+  static Future<void> addToHistory({
+    required Map<String, dynamic> foodDetails,
+    Map<String, dynamic>? assessment,
+    Map<String, dynamic>? recommendedIntake,
+    String? gender,
+    String? portionSize,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     final history = await getHistory();
 
-    history.insert(0, foodDetails);
+    Map<String, dynamic> fullEntry = {
+      'foodDetails': foodDetails,
+      'assessment': assessment,
+      'recommendedIntake': recommendedIntake,
+      'gender': gender,
+      'portionSize': portionSize,
+    };
 
-    if (history.length > 5) {
-      history.removeLast();
-    }
+    history.insert(0, fullEntry);
+    if (history.length > 5) history.removeLast();
 
     final encoded = jsonEncode(history);
     await prefs.setString(_key, encoded);

@@ -134,29 +134,68 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
 
   Future<void> _showPortionInputDialog() async {
     if (_foodId == null) {
-      // If no food ID is detected, don't show the dialog
       return;
     }
 
     TextEditingController _controller = TextEditingController();
+    DatabaseHelper dbHelper = DatabaseHelper();
 
-    // Get the portion type for the detected food
-    String portionType = await _getPortionTypeFromDatabase(_foodId!);
+    String portionType = 'Unknown';
+    double servingSize = 0.0;
+
+    try {
+      final db = await dbHelper.database;
+
+      // Get food_uid
+      var foodIdResult = await db.rawQuery(
+        '''
+      SELECT food_uid
+      FROM food_items
+      WHERE LOWER(food_name) = ?
+      ''',
+        [_foodId!.trim().toLowerCase()],
+      );
+
+      if (foodIdResult.isNotEmpty) {
+        String foodUid = foodIdResult.first['food_uid'] as String;
+
+        // Get portion and serving size
+        var result = await db.rawQuery(
+          '''
+        SELECT portion, serving_size
+        FROM food_servings
+        WHERE food_uid = ?
+        ''',
+          [foodUid],
+        );
+
+        if (result.isNotEmpty) {
+          portionType = result.first['portion']?.toString() ?? 'Unknown';
+          servingSize = double.tryParse(result.first['serving_size'].toString()) ?? 0.0;
+        }
+      }
+    } catch (e) {
+      print("Error fetching portion info: $e");
+    }
 
     await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Enter Portion Size"),
+          title: const Text("Enter Portion Size"),
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Portion type: $portionType"), // Display the portion type here
+              Text("Serving Type: 1 $portionType"),
+              if (servingSize > 0)
+                Text("Serving Size: $servingSize g"),
+              const SizedBox(height: 8),
+              const Text("Enter how many servings (e.g. 1 or 1/2 (0.5):"),
               TextField(
                 controller: _controller,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
                   hintText: "e.g. 1 or 1/2",
                 ),
               ),
@@ -181,6 +220,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       },
     );
   }
+
 
 
   // This method will query the database to get the portion type for the given foodId
@@ -253,9 +293,18 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         recommendedRow: recommendedRow,
         gender: userGender,
         activity: userActivity,
+        portionSize: _portionSize,
       );
 
-      await FoodHistory.addToHistory(foodDetails);
+
+      await FoodHistory.addToHistory(
+        foodDetails: foodDetails,
+        assessment: assessment,
+        recommendedIntake: recommendedRow,
+        gender: userGender,
+        portionSize: _portionSize,
+      );
+
 
       Navigator.push(
         context,
@@ -392,8 +441,16 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
+                  if (_portionSize == null || _portionSize!.isEmpty)
+                    Text(
+                      "Please enter portion size before viewing result.",
+                      style: TextStyle(color: Colors.red.shade700, fontStyle: FontStyle.italic),
+                    ),
+
                   ElevatedButton.icon(
-                    onPressed: _foodResult != null && !_foodResult!.contains("Error") ? _getAdvice : null,
+                    onPressed: (_foodResult != null && !_foodResult!.contains("Error") && _portionSize != null && _portionSize!.isNotEmpty)
+                        ? _getAdvice
+                        : null,
                     icon: const Icon(Icons.insights),
                     label: const Text("View Result"),
                     style: ElevatedButton.styleFrom(

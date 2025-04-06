@@ -346,7 +346,16 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         selectedTip = "You're on track with your nutrient intake! Keep it up!";
       }
 
-      // Save to history
+      final List<String> notices = [
+        "Reminder: Recommended nutrient values are per day, not per meal. You can still consume nutrients you're lacking, but avoid those already in excess.",
+        "Please remember: Nutrient guidelines are for daily totals, not per food item. Add more of the nutrients you're low on and skip the ones you’re exceeding.",
+        "Important: Daily recommendations refer to overall intake, not individual foods. Increase nutrients you’re missing and reduce those you’re getting too much of.",
+        "Keep in mind: Nutrient needs are measured per day. You may eat more of the nutrients you’re deficient in, but limit the ones you’re already getting too much of.",
+        "Please be aware: Nutritional guidelines apply to daily intake. It’s okay to eat more of the nutrients you’re lacking, but avoid further intake of those in excess.",
+      ];
+
+      final String selectedNotice = notices[Random().nextInt(notices.length)];
+
       await FoodHistory.addToHistory(
         foodDetails: foodDetails,
         assessment: assessment,
@@ -354,6 +363,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         gender: userGender,
         portionSize: _portionSize,
         tip: selectedTip,
+        notice: selectedNotice,
       );
 
       // Navigate to advice page with selected tip
@@ -367,6 +377,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
             gender: userGender,
             portionSize: _portionSize,
             tip: selectedTip,
+            notice: selectedNotice,
           ),
         ),
       );

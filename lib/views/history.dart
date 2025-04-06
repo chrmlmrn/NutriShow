@@ -124,7 +124,8 @@ class FoodHistoryPage extends StatelessWidget {
                                   recommendedIntake: recommendedIntake,
                                   gender: gender,
                                   portionSize: item['portionSize'],
-                                  tip: item['tip'], // <-- Add this
+                                  tip: item['tip'],
+                                  notice: item['notice'], // NEW
                                 ),
                               ),
                             );

@@ -10,6 +10,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
   final String? gender;
   final String? portionSize;
   final String? tip;
+  final String? notice;
 
   const MacronutrientAdvicePage({
     super.key,
@@ -19,6 +20,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
     this.gender,
     this.portionSize,
     this.tip,
+    this.notice,
   });
 
   double _adjustForPortion(dynamic value) {
@@ -173,7 +175,18 @@ class MacronutrientAdvicePage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-
+                    if (notice != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: Text(
+                          "ℹ️ $notice",
+                          style: GoogleFonts.nunito(
+                            fontSize: 15,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
                     Text(
                       "Too much nutrients (${(assessment?['too_much'] as List?)?.length ?? 0}):",
                       style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.w600),

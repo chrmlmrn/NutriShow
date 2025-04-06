@@ -114,20 +114,21 @@ class FoodHistoryPage extends StatelessWidget {
                           size: 24,
                           color: Color(0xFF0E4A06),
                         ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => MacronutrientAdvicePage(
-                              foodDetails: foodDetails,
-                              assessment: assessment,
-                              recommendedIntake: recommendedIntake,
-                              gender: gender,
-                              portionSize: item['portionSize'],
-                            ),
-                            ),
-                          );
-                        },
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MacronutrientAdvicePage(
+                                  foodDetails: foodDetails,
+                                  assessment: assessment,
+                                  recommendedIntake: recommendedIntake,
+                                  gender: gender,
+                                  portionSize: item['portionSize'],
+                                  tip: item['tip'], // <-- Add this
+                                ),
+                              ),
+                            );
+                          }
                       ),
                     ),
                   ),

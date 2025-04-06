@@ -10,6 +10,7 @@ class FoodHistory {
     Map<String, dynamic>? recommendedIntake,
     String? gender,
     String? portionSize,
+    String? tip,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final history = await getHistory();
@@ -20,6 +21,7 @@ class FoodHistory {
       'recommendedIntake': recommendedIntake,
       'gender': gender,
       'portionSize': portionSize,
+      'tip': tip, // <-- Add this line
     };
 
     history.insert(0, fullEntry);
@@ -28,6 +30,7 @@ class FoodHistory {
     final encoded = jsonEncode(history);
     await prefs.setString(_key, encoded);
   }
+
 
   // Retrieve history
   static Future<List<Map<String, dynamic>>> getHistory() async {

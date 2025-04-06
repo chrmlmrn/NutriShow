@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -296,16 +297,66 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         portionSize: _portionSize,
       );
 
+      // 🧠 Dietary Tips
+      final List<String> bothTips = [
+        "Please make sure to cut the nutrient intake for those with too much and consume more for those lacking/less.",
+        "Make necessary dietary changes by limiting overconsumed nutrients and increasing those that are lacking.",
+        "Improve your nutrient balance by eating less of what’s excessive and more of what’s insufficient.",
+        "Moderate your nutrient levels—reduce excesses and supplement deficiencies accordingly.",
+        "Ensure proper nutrition by decreasing overconsumed nutrients and boosting underconsumed ones.",
+        "Regulate your diet by lowering excessive nutrients and increasing those in short supply.",
+        "Optimize your nutrient intake by consuming less of what’s excessive and more of what’s insufficient.",
+        "Maintain a healthy balance by reducing nutrients that exceed recommendations and increasing those that fall short.",
+        "Keep your nutrient intake in check by lowering what’s too much and adding what’s too little.",
+        "Ensure a well-rounded diet by consuming less of what you have too much of and more of what you need.",
+        "Correct imbalances in your diet by lowering high nutrient levels and raising low ones.",
+        "Manage your nutrition by reducing excessive intake and boosting nutrients that are below recommended levels.",
+        "Strive for a balanced diet by cutting down on overconsumed nutrients and replenishing deficiencies.",
+        "Adjust your food choices to decrease excess nutrients and increase those that are lacking.",
+        "Make dietary adjustments by limiting excess nutrients and incorporating more of the ones you’re missing.",
+      ];
 
+      final List<String> tooMuchOnlyTips = [
+        "Your intake shows excess in certain nutrients; please reduce their consumption.",
+        "Certain nutrients are higher than necessary—moderate your intake accordingly.",
+        "Some nutrients exceed healthy limits—consider adjusting your diet to lower them.",
+        "Too much of certain nutrients was detected—lowering your intake is advised.",
+        "Some nutrients are above the recommended levels—consider lowering your intake.",
+      ];
+
+      final List<String> lackingOnlyTips = [
+        "Your diet is lacking certain nutrients—consider consuming more of them.",
+        "Your intake is below optimal levels for certain nutrients—add more to your meals.",
+        "Below-recommended nutrient levels found—consider eating more of the right foods.",
+        "To meet your nutritional needs, increase intake of the nutrients you're currently lacking.",
+        "Some important nutrients are insufficient—incorporate more of them into your diet.",
+      ];
+
+      final tooMuch = assessment['too_much'] as List? ?? [];
+      final lacking = assessment['lacking'] as List? ?? [];
+
+      String selectedTip;
+      if (tooMuch.isNotEmpty && lacking.isNotEmpty) {
+        selectedTip = bothTips[Random().nextInt(bothTips.length)];
+      } else if (tooMuch.isNotEmpty) {
+        selectedTip = tooMuchOnlyTips[Random().nextInt(tooMuchOnlyTips.length)];
+      } else if (lacking.isNotEmpty) {
+        selectedTip = lackingOnlyTips[Random().nextInt(lackingOnlyTips.length)];
+      } else {
+        selectedTip = "You're on track with your nutrient intake! Keep it up!";
+      }
+
+      // Save to history
       await FoodHistory.addToHistory(
         foodDetails: foodDetails,
         assessment: assessment,
         recommendedIntake: recommendedRow,
         gender: userGender,
         portionSize: _portionSize,
+        tip: selectedTip,
       );
 
-
+      // Navigate to advice page with selected tip
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -315,6 +366,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
             recommendedIntake: recommendedRow,
             gender: userGender,
             portionSize: _portionSize,
+            tip: selectedTip,
           ),
         ),
       );

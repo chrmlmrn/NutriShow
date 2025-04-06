@@ -91,9 +91,9 @@ class DatabaseHelper {
       "Vitamin C": ["vitamin_c_mg", "vitamin_c_$g", "mg"],
       "Vitamin B6": ["vitamin_b6_mg", "vitamin_b6_$g", "mg"],
       "Folate": ["folate_ug", "folate_$g", "mcg"],
-      "Vitamin A": ["vitamin_a_ug", "vitamin_a_$g", "mcg"],
+      "Vitamin A": ["vitamin_a_ug", "vitamin_a_$g", "μg"],
       "Vitamin E": ["vitamin_e_mg", "vitamin_e_$g", "mg"],
-      "Vitamin K": ["vitamin_k_ug", "vitamin_k_$g", "mcg"],
+      "Vitamin K": ["vitamin_k_ug", "vitamin_k_$g", "μg"],
       "Calcium": ["calcium_mg", "calcium_$g", "mg"],
       "Potassium": ["potassium_mg", "potassium", "mg"],
     };

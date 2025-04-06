@@ -9,8 +9,17 @@ class MacronutrientAdvicePage extends StatelessWidget {
   final Map<String, dynamic>? recommendedIntake;
   final String? gender;
   final String? portionSize;
+  final String? tip;
 
-  const MacronutrientAdvicePage({super.key, required this.foodDetails, this.assessment, this.recommendedIntake, this.gender, this.portionSize});
+  const MacronutrientAdvicePage({
+    super.key,
+    required this.foodDetails,
+    this.assessment,
+    this.recommendedIntake,
+    this.gender,
+    this.portionSize,
+    this.tip,
+  });
 
   double _adjustForPortion(dynamic value) {
     // Ensure the value is a double
@@ -62,7 +71,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
       "Make dietary adjustments by limiting excess nutrients and incorporating more of the ones you’re missing.",
     ];
 
-    final String _randomTip = _dietTips[Random().nextInt(_dietTips.length)];
+    final String finalTip = tip ?? _dietTips[Random().nextInt(_dietTips.length)];
 
     return Scaffold(
       backgroundColor: Color(0xFFF9FEEB),
@@ -141,12 +150,12 @@ class MacronutrientAdvicePage extends StatelessWidget {
                     Divider(thickness: 1.5, color: Colors.black26),
 
                     _buildCategoryHeader("Vitamins"),
-                    _buildNutrientRow("🍃 Folate", _adjustForPortion(foodDetails['folate_ug'] ?? 0), "mcg"),
+                    _buildNutrientRow("🍃 Folate", _adjustForPortion(foodDetails['folate_ug'] ?? 0), "μg"),
                     _buildNutrientRow("🍊 Vitamin C", _adjustForPortion(foodDetails['vitamin_c_mg'] ?? 0), "mg"),
                     _buildNutrientRow("🥩 Vitamin B-6", _adjustForPortion(foodDetails['vitamin_b6_mg'] ?? 0), "mg"),
-                    _buildNutrientRow("👀 Vitamin A", _adjustForPortion(foodDetails['vitamin_a_ug'] ?? 0), "mcg"),
+                    _buildNutrientRow("👀 Vitamin A", _adjustForPortion(foodDetails['vitamin_a_ug'] ?? 0), "μg"),
                     _buildNutrientRow("🥜 Vitamin E", _adjustForPortion(foodDetails['vitamin_e_mg'] ?? 0), "mg"),
-                    _buildNutrientRow("🥬 Vitamin K", _adjustForPortion(foodDetails['vitamin_k_ug'] ?? 0), "mcg"),
+                    _buildNutrientRow("🥬 Vitamin K", _adjustForPortion(foodDetails['vitamin_k_ug'] ?? 0), "μg"),
                   ],
                 ),
               ),
@@ -208,7 +217,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
                         ..._buildRecommendedIntakeList(recommendedIntake!),
                         const SizedBox(height: 12),
                         Text(
-                          "📌 $_randomTip",
+                          "📌 $finalTip",
                           style: GoogleFonts.nunito(
                             fontSize: 16,
                             fontStyle: FontStyle.italic,
@@ -362,31 +371,33 @@ class MacronutrientAdvicePage extends StatelessWidget {
     final isMale = gender?.toLowerCase().startsWith('m') ?? true;
 
     final nutrientsToShow = {
-      "energy_${isMale ? 'm' : 'f'}_a": "Energy",
-      "protein_${isMale ? 'm' : 'f'}": "Protein",
-      "carbohydrates_${isMale ? 'm' : 'f'}_a_min": "Carbohydrates",
-      "fiber_min": "Fiber",
-      "total_sugars_${isMale ? 'm' : 'f'}_a": "Total Sugars",
-      "total_fat_${isMale ? 'm' : 'f'}_a_max": "Total Fat",
-      "sodium": "Sodium",
-      "iron_${isMale ? 'm' : 'f'}": "Iron",
-      "zinc_${isMale ? 'm' : 'f'}": "Zinc",
-      "vitamin_c_${isMale ? 'm' : 'f'}": "Vitamin C",
-      "vitamin_b6_${isMale ? 'm' : 'f'}": "Vitamin B6",
-      "folate_${isMale ? 'm' : 'f'}": "Folate",
-      "vitamin_a_${isMale ? 'm' : 'f'}": "Vitamin A",
-      "vitamin_e_${isMale ? 'm' : 'f'}": "Vitamin E",
-      "vitamin_k_${isMale ? 'm' : 'f'}": "Vitamin K",
-      "calcium_${isMale ? 'm' : 'f'}": "Calcium",
-      "potassium": "Potassium",
+      "energy_${isMale ? 'm' : 'f'}_a": ["Energy", "kcal"],
+      "protein_${isMale ? 'm' : 'f'}": ["Protein", "g"],
+      "carbohydrates_${isMale ? 'm' : 'f'}_a_min": ["Carbohydrates", "g"],
+      "fiber_min": ["Fiber", "g"],
+      "total_sugars_${isMale ? 'm' : 'f'}_a": ["Total Sugars", "g"],
+      "total_fat_${isMale ? 'm' : 'f'}_a_max": ["Total Fat", "g"],
+      "sodium": ["Sodium", "mg"],
+      "iron_${isMale ? 'm' : 'f'}": ["Iron", "mg"],
+      "zinc_${isMale ? 'm' : 'f'}": ["Zinc", "mg"],
+      "vitamin_c_${isMale ? 'm' : 'f'}": ["Vitamin C", "mg"],
+      "vitamin_b6_${isMale ? 'm' : 'f'}": ["Vitamin B6", "mg"],
+      "folate_${isMale ? 'm' : 'f'}": ["Folate", "μg"],
+      "vitamin_a_${isMale ? 'm' : 'f'}": ["Vitamin A", "μg"],
+      "vitamin_e_${isMale ? 'm' : 'f'}": ["Vitamin E", "mg"],
+      "vitamin_k_${isMale ? 'm' : 'f'}": ["Vitamin K", "μg"],
+      "calcium_${isMale ? 'm' : 'f'}": ["Calcium", "mg"],
+      "potassium": ["Potassium", "mg"],
     };
 
     return nutrientsToShow.entries.map((entry) {
       final value = intake[entry.key];
+      final nutrientName = entry.value[0];
+      final unit = entry.value[1];
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 2.0),
         child: Text(
-          "• ${entry.value}: ${value ?? '—'}",
+          "• $nutrientName: ${value ?? '—'} $unit",
           style: GoogleFonts.nunito(fontSize: 16),
         ),
       );

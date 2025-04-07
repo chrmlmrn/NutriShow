@@ -132,8 +132,9 @@ class _UserInputScreenState extends State<UserInputScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text("BMI Status"),
-            content: Text("Your BMI is ${bmi.toStringAsFixed(2)}.\nYou are in the Healthy Weight range."),
+            backgroundColor: Color(0xFFCFE3DA),
+            title: Text("BMI Status", style: GoogleFonts.poppins(fontSize: 25, color: Color(0xFF0E4A06), fontWeight:FontWeight.w700)),
+            content: Text("You're doing well! A BMI of ${bmi.toStringAsFixed(2)} puts you in the \"Healthy Weight\" category. Keep it up!"),
             actions: [
               TextButton(
                 onPressed: () {
@@ -143,13 +144,13 @@ class _UserInputScreenState extends State<UserInputScreen> {
                     MaterialPageRoute(builder: (context) => const DishOptionsScreen()),
                   );
                 },
-                child: const Text("Continue"),
+                child: Text("Continue", style: GoogleFonts.poppins(fontSize: 15, color: Color(0xFF0E4A06), fontWeight:FontWeight.w700)),
               ),
             ],
           ),
         );
       } else {
-        _showErrorDialog("Your BMI is ${bmi.toStringAsFixed(2)}.\nYou are in the $category range.\nOnly users in the Healthy Weight range can proceed.");
+        _showErrorDialog("Your BMI is ${bmi.toStringAsFixed(2)}. You are in the \"$category\" range. We advice that you seek the expertise of a Registered Nutritionist-Dietitian to get a personalized patient-centered nutrition consultation and dietary plan. \n\nOnly users in the \"Healthy Weight\" range can proceed.");
       }
     } else {
       _showErrorDialog("Please fill in all the fields to proceed.");
@@ -160,19 +161,18 @@ class _UserInputScreenState extends State<UserInputScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Notice"),
+        backgroundColor: Color(0xFFCFE3DA),
+        title: Text("Notice", style: GoogleFonts.poppins(fontSize: 25, color: Color(0xFF0E4A06), fontWeight:FontWeight.w700)),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("OK"),
+            child: Text("OK", style: GoogleFonts.poppins(fontSize: 15, color: Color(0xFF0E4A06), fontWeight:FontWeight.w700)),
           ),
         ],
       ),
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +183,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const SizedBox(height: 60),
+            const SizedBox(height: 50),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -210,7 +210,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                 color: Color(0xFF0E4A06),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 35),
             TextField(
               controller: _ageController,
               keyboardType: TextInputType.number, // Allows only numeric input

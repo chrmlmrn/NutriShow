@@ -105,8 +105,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     }
   }
 
-
-
   Future<void> _takePhoto() async {
     final photo = await _picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
@@ -183,16 +181,17 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Enter Portion Size"),
+          backgroundColor: Color(0xFFCFE3DA),
+          title: Text("Enter Portion", style: GoogleFonts.poppins(fontSize: 25, color: Color(0xFF0E4A06), fontWeight:FontWeight.w700)),
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Serving Type: 1 $portionType"),
+              Text("Portion Type: 1 $portionType"),
               if (servingSize > 0)
-                Text("Serving Size: $servingSize g"),
-              const SizedBox(height: 8),
-              const Text("Enter how many servings (e.g. 1 or 1/2 (0.5):"),
+                Text("Amount: $servingSize g"),
+              const SizedBox(height: 9),
+              const Text("Enter how many portion (e.g. 1 or 1/2 (0.5):"),
               TextField(
                 controller: _controller,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -204,25 +203,27 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           ),
           actions: [
             TextButton(
-              child: const Text("Cancel"),
+              child: Text("Cancel", style: GoogleFonts.poppins(fontSize: 15, color: Color(0xFF0E4A06), fontWeight:FontWeight.w700)),
               onPressed: () => Navigator.pop(context),
             ),
             ElevatedButton(
-              child: const Text("OK"),
-              onPressed: () {
-                setState(() {
-                  _portionSize = _controller.text;
-                });
-                Navigator.pop(context);
-              },
+                onPressed: () {
+                  setState(() {
+                    _portionSize = _controller.text;
+                  });
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFAAD3C4),
+                  foregroundColor:  Color(0xFF0E4A06),
+                ),
+                child: Text("OK", style: GoogleFonts.poppins(fontSize: 15, color: Color(0xFF0E4A06), fontWeight:FontWeight.w700))
             ),
           ],
         );
       },
     );
   }
-
-
 
   // This method will query the database to get the portion type for the given foodId
   Future<String> _getPortionTypeFromDatabase(String foodName) async {
@@ -270,8 +271,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       return 'Unknown';  // Fallback if an error occurs
     }
   }
-
-
 
   Future<void> _getAdvice() async {
     if (_foodResult == null) return;
@@ -323,7 +322,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         "Too much of certain nutrients was detected—lowering your intake is advised.",
         "Some nutrients are above the recommended levels—consider lowering your intake.",
       ];
-
       final List<String> lackingOnlyTips = [
         "Your diet is lacking certain nutrients—consider consuming more of them.",
         "Your intake is below optimal levels for certain nutrients—add more to your meals.",
@@ -352,6 +350,8 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         "Important: Daily recommendations refer to overall intake, not individual foods. Increase nutrients you’re missing and reduce those you’re getting too much of.",
         "Keep in mind: Nutrient needs are measured per day. You may eat more of the nutrients you’re deficient in, but limit the ones you’re already getting too much of.",
         "Please be aware: Nutritional guidelines apply to daily intake. It’s okay to eat more of the nutrients you’re lacking, but avoid further intake of those in excess.",
+        "Take note: There is no single food that contains all the nutrients that our body needs so eating a variety of food ensures that daily nutritional needs are met.",
+        "Be mindful: Diet-related diseases are on the rise across all age groups. Thus, eat a variety of foods everyday to get the nutrients needed by the body."
       ];
 
       final String selectedNotice = notices[Random().nextInt(notices.length)];
@@ -459,15 +459,16 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
               if (_foodResult != null)
                 Text(
                   _foodResult!,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: Colors.black87),
                   textAlign: TextAlign.center,
                 ),
+              const SizedBox(height: 6),
               if (_portionSize != null)
                 Text(
                   "Portion: $_portionSize",
                   style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black54),
                 ),
-              const SizedBox(height: 45),
+              const SizedBox(height: 35),
               Column(
                 mainAxisSize: MainAxisSize.min, // Ensure all buttons stack up and are centered
                 children: [
@@ -476,40 +477,40 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                     icon: const Icon(Icons.camera_alt),
                     label: const Text("Take a Photo"),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
-                      backgroundColor: Color(0xFF5D8736),
-                      foregroundColor: Color(0xFFF4FFC3),
+                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
+                        backgroundColor: Color(0xFFABCB4D),
+                        foregroundColor: Color(0xFF0E4A06)
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 15),
                   ElevatedButton.icon(
                     onPressed: _uploadDish,
                     icon: const Icon(Icons.upload),
                     label: const Text("Upload from Gallery"),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 33, vertical: 14),
-                      backgroundColor: Color(0xFF5D8736),
-                      foregroundColor: Color(0xFFF4FFC3),
+                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                        backgroundColor: Color(0xFFABCB4D),
+                        foregroundColor: Color(0xFF0E4A06)
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 17),
                   ElevatedButton.icon(
                     onPressed: _foodId != null ? _showPortionInputDialog : null, // Only allow showing dialog if foodId is set
                     icon: const Icon(Icons.edit),
                     label: const Text("Enter Portion"),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
-                      backgroundColor: Color(0xFF5D8736),
-                      foregroundColor: Color(0xFFF4FFC3),
+                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
+                        backgroundColor: Color(0xFFABCB4D),
+                        foregroundColor: Color(0xFF0E4A06)
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   if (_portionSize == null || _portionSize!.isEmpty)
                     Text(
                       "Please enter portion size before viewing result.",
                       style: TextStyle(color: Colors.red.shade700, fontStyle: FontStyle.italic),
                     ),
-
+                  const SizedBox(height: 3),
                   ElevatedButton.icon(
                     onPressed: (_foodResult != null && !_foodResult!.contains("Error") && _portionSize != null && _portionSize!.isNotEmpty)
                         ? _getAdvice
@@ -520,7 +521,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 65, vertical: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: 55, vertical: 14),
                       backgroundColor: Color(0xFF5D8736),
                       foregroundColor: Color(0xFFF4FFC3),
                     ),

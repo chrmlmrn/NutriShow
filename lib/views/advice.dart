@@ -84,7 +84,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
         iconTheme: IconThemeData(color: Color(0xFF0E4A06), size: 30),
         title: Text(
           'Dietary Assessment',
-          style: GoogleFonts.nunito(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
+          style: GoogleFonts.nunito(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
         ),
         actions: [
           IconButton(
@@ -108,7 +108,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
               Text(
                 foodDetails['food_name']?.toString().toUpperCase() ?? "UNKNOWN FOOD",
                 style: GoogleFonts.poppins(
-                  fontSize: 24,
+                  fontSize: 25,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF0E4A06),
                 ),
@@ -119,15 +119,15 @@ class MacronutrientAdvicePage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 6.0),
                   child: Text(
-                    "Portion Size: $portionSize serving(s) • ${_calculateTotalGrams()} grams",
+                    "Portion: $portionSize serving(s) • ${_calculateTotalGrams()} grams",
                     style: GoogleFonts.nunito(
-                      fontSize: 16,
+                      fontSize: 17,
                       fontStyle: FontStyle.italic,
                       color: Colors.black87,
                     ),
                   ),
                 ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
               _buildNutritionFactsCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,9 +179,9 @@ class MacronutrientAdvicePage extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 12.0),
                         child: Text(
-                          "ℹ️ $notice",
+                          "ℹ️  $notice",
                           style: GoogleFonts.nunito(
-                            fontSize: 15,
+                            fontSize: 15.5,
                             fontStyle: FontStyle.italic,
                             color: Colors.black87,
                           ),
@@ -189,16 +189,16 @@ class MacronutrientAdvicePage extends StatelessWidget {
                       ),
                     Text(
                       "Too much nutrients (${(assessment?['too_much'] as List?)?.length ?? 0}):",
-                      style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.w700),
                     ),
                     if ((assessment?['too_much'] as List?)?.isEmpty ?? true)
-                      Text("• None", style: GoogleFonts.nunito(fontSize: 16))
+                      Text("• None", style: GoogleFonts.nunito(fontSize: 16.5))
                     else
                       ...List.generate(
                         (assessment!['too_much'] as List).length,
                             (index) => Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2.0),
-                          child: Text("• ${assessment!['too_much'][index]}", style: GoogleFonts.nunito(fontSize: 16)),
+                          child: Text("• ${assessment!['too_much'][index]}", style: GoogleFonts.nunito(fontSize: 16.5)),
                         ),
                       ),
 
@@ -206,43 +206,44 @@ class MacronutrientAdvicePage extends StatelessWidget {
 
                     Text(
                       "Lacking nutrients (${(assessment?['lacking'] as List?)?.length ?? 0}):",
-                      style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.w700),
                     ),
                     if ((assessment?['lacking'] as List?)?.isEmpty ?? true)
-                      Text("• None", style: GoogleFonts.nunito(fontSize: 16))
+                      Text("• None", style: GoogleFonts.nunito(fontSize: 16.5))
                     else
                       ...List.generate(
                         (assessment!['lacking'] as List).length,
                             (index) => Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2.0),
-                          child: Text("• ${assessment!['lacking'][index]}", style: GoogleFonts.nunito(fontSize: 16)),
+                          child: Text("• ${assessment!['lacking'][index]}", style: GoogleFonts.nunito(fontSize: 16.5)),
                         ),
                       ),
                     const SizedBox(height: 16),
                     Text(
                       "Recommended Nutrient Intake:",
-                      style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 4),
 
                     if (recommendedIntake != null)
                       ...[
                         ..._buildRecommendedIntakeList(recommendedIntake!),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 22),
                         Text(
                           "📌 $finalTip",
                           style: GoogleFonts.nunito(
-                            fontSize: 16,
+                            fontSize: 16.5,
                             fontStyle: FontStyle.italic,
                             color: Colors.black87,
                           ),
                         ),
                       ]
                     else
-                      Text("• Not available", style: GoogleFonts.nunito(fontSize: 16)),
+                      Text("• Not available", style: GoogleFonts.nunito(fontSize: 16.5)),
                   ],
                 ),
               ),
+              const SizedBox(height: 22),
             ],
           ),
         ),
@@ -335,7 +336,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
             style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.w500),
           ),
           Text(
-              "${(value as num?)?.toStringAsFixed(3) ?? 'Unknown'} $unit",
+              "${(value as num?)?.toStringAsFixed(2) ?? 'Unknown'} $unit",
               style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.blueGrey),
           ),
         ],
@@ -351,11 +352,11 @@ class MacronutrientAdvicePage extends StatelessWidget {
         children: [
           Text(
             name,
-            style: GoogleFonts.nunito(fontSize: 16, fontStyle: FontStyle.italic),
+            style: GoogleFonts.nunito(fontSize: 16.5, fontStyle: FontStyle.italic),
           ),
           Text(
             "${(value as num?)?.toStringAsFixed(3) ?? 'Unknown'} $unit",
-            style: GoogleFonts.nunito(fontSize: 16, color: Colors.blueGrey),
+            style: GoogleFonts.nunito(fontSize: 16.5, color: Colors.blueGrey),
           ),
         ],
       ),
@@ -411,7 +412,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 2.0),
         child: Text(
           "• $nutrientName: ${value ?? '—'} $unit",
-          style: GoogleFonts.nunito(fontSize: 16),
+          style: GoogleFonts.nunito(fontSize: 16.5),
         ),
       );
     }).toList();

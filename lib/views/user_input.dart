@@ -141,7 +141,12 @@ class _UserInputScreenState extends State<UserInputScreen> {
                   Navigator.pop(context);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const DishOptionsScreen()),
+                    MaterialPageRoute(builder: (context) => DishOptionsScreen(
+                      age: int.parse(_ageController.text),
+                      gender: _selectedGender!,
+                      activity: _selectedActivityLevel!,
+                    ),
+                  ),
                   );
                 },
                 child: Text("Continue", style: GoogleFonts.poppins(fontSize: 15, color: Color(0xFF0E4A06), fontWeight:FontWeight.w700)),

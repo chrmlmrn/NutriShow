@@ -7,6 +7,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
   final Map<String, dynamic> foodDetails;
   final Map<String, dynamic>? assessment;
   final Map<String, dynamic>? recommendedIntake;
+  final List<String>? pinnedTips;
   final String? gender;
   final String? portionSize;
   final String? tip;
@@ -21,6 +22,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
     this.portionSize,
     this.tip,
     this.notice,
+    this.pinnedTips,
   });
 
   double _adjustForPortion(dynamic value) {
@@ -46,7 +48,88 @@ class MacronutrientAdvicePage extends StatelessWidget {
     double portionMultiplier = double.tryParse(portionSize!) ?? 1;
     return nutrientValue * portionMultiplier;
   }
+  List<Widget> _buildPinnedAdvice() {
+    final tooMuch = assessment?['too_much'] as List? ?? [];
+    final lacking = assessment?['lacking'] as List? ?? [];
+    final List<String> pins = [];
+    final rand = Random();
 
+    final proteinTooMuch = [
+      "Your protein intake is too high—try cutting back a bit.",
+      "Excess protein detected—moderation is advised.",
+      "Consider limiting your protein intake as it exceeds recommendations.",
+      "High protein levels found—consider lighter, low-protein food options.",
+      "Protein intake is above the healthy limit—consume less for balance.",
+    ];
+    final carbsTooMuch = [
+      "Carbohydrate levels are above ideal—moderate your consumption.",
+      "Cut back on carbs to stay within recommended limits.",
+      "Carbs are a bit too high—balance your meals accordingly.",
+      "Consider eating fewer carbohydrates to stay within the healthy range.",
+      "Your carbohydrate intake is too high—try to reduce it.",
+    ];
+    final fatsTooMuch = [
+      "You’ve surpassed the healthy fat limit—adjust your consumption.",
+      "You're going over the fat recommendation—reduce for a healthier balance.",
+      "Fat intake should be moderated—consider choosing low-fat alternatives.",
+      "You’ve gone past the ideal fat intake—scale it down to improve balance.",
+      "Fat intake exceeded the recommended amount—moderate it accordingly.",
+    ];
+
+    final proteinLack = [
+      "Your protein intake is lower than recommended—try to include more in your diet.",
+      "You're not getting enough protein—consider adding protein-rich foods.",
+      "Consider boosting your protein intake to meet daily requirements.",
+      "You may need more protein—add protein-rich meals or snacks.",
+      "Not enough protein was found—try including more in your meals.",
+    ];
+    final carbsLack = [
+      "You need more energy from carbs—consider adding more to your meals.",
+      "Your current intake is low on carbs—consider increasing for sustained energy.",
+      "You're consuming fewer carbs than needed—add more to your diet.",
+      "Low carbohydrate levels detected—try increasing your intake.",
+      "You're falling short on carbs—try balancing your meals better.",
+    ];
+    final fatsLack = [
+      "Fat intake is too low—try including more in your meals.",
+      "Low fat levels detected—consider boosting healthy fat intake.",
+      "Fats are crucial and currently insufficient—add more nutritious fats.",
+      "You're not meeting the daily fat requirement—eat more balanced fat sources.",
+      "Try increasing your intake of healthy fats to improve overall nutrition.",
+    ];
+
+    if (tooMuch.any((e) => e.toLowerCase().contains("protein"))) {
+      pins.add("\uD83D\uDCCC ${proteinTooMuch[rand.nextInt(5)]}");
+    }
+    if (tooMuch.any((e) => e.toLowerCase().contains("carbohydrate"))) {
+      pins.add("\uD83D\uDCCC ${carbsTooMuch[rand.nextInt(5)]}");
+    }
+    if (tooMuch.any((e) => e.toLowerCase().contains("fat"))) {
+      pins.add("\uD83D\uDCCC ${fatsTooMuch[rand.nextInt(5)]}");
+    }
+
+    if (lacking.any((e) => e.toLowerCase().contains("protein"))) {
+      pins.add("\uD83D\uDCCC ${proteinLack[rand.nextInt(5)]}");
+    }
+    if (lacking.any((e) => e.toLowerCase().contains("carbohydrate"))) {
+      pins.add("\uD83D\uDCCC ${carbsLack[rand.nextInt(5)]}");
+    }
+    if (lacking.any((e) => e.toLowerCase().contains("fat"))) {
+      pins.add("\uD83D\uDCCC ${fatsLack[rand.nextInt(5)]}");
+    }
+
+    return pins.map((msg) => Padding(
+      padding: const EdgeInsets.only(bottom: 6.0),
+      child: Text(
+        msg,
+        style: GoogleFonts.nunito(
+          fontSize: 16.5,
+          fontStyle: FontStyle.italic,
+          color: Colors.deepOrange,
+        ),
+      ),
+    )).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,15 +311,18 @@ class MacronutrientAdvicePage extends StatelessWidget {
                     if (recommendedIntake != null)
                       ...[
                         ..._buildRecommendedIntakeList(recommendedIntake!),
-                        const SizedBox(height: 22),
-                        Text(
-                          "📌 $finalTip",
-                          style: GoogleFonts.nunito(
-                            fontSize: 16.5,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.black87,
+                        const SizedBox(height: 16),
+                        ...(pinnedTips?.map((msg) => Padding(
+                          padding: const EdgeInsets.only(bottom: 6.0),
+                          child: Text(
+                            msg,
+                            style: GoogleFonts.nunito(
+                              fontSize: 16.5,
+                              fontStyle: FontStyle.italic,
+                              color: Colors.deepOrange,
+                            ),
                           ),
-                        ),
+                        )).toList() ?? _buildPinnedAdvice())
                       ]
                     else
                       Text("• Not available", style: GoogleFonts.nunito(fontSize: 16.5)),

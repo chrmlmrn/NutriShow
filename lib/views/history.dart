@@ -111,6 +111,15 @@ class FoodHistoryPage extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 11),
+                              Text(
+                                "🕒 ${DateTime.tryParse(item['timestamp'] ?? '')?.toLocal().toString().split('.')[0] ?? 'Unknown time'}",
+                                style: GoogleFonts.nunito(
+                                  fontSize: 14,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
                               Text("Calories: ${calories.toStringAsFixed(2)} kcal", style: GoogleFonts.nunito(fontSize:15)),
                               Text("Protein: ${protein.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
                               Text("Carbs: ${carbs.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
@@ -132,7 +141,7 @@ class FoodHistoryPage extends StatelessWidget {
                                   recommendedIntake: recommendedIntake,
                                   gender: gender,
                                   portionSize: item['portionSize'],
-                                  tip: item['tip'],
+                                  pinnedTips: (item['pinnedTips'] as String?)?.split('|'),
                                   notice: item['notice'], // NEW
                                 ),
                               ),

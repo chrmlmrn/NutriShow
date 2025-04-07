@@ -12,6 +12,7 @@ class FoodHistory {
     String? portionSize,
     String? tip,
     String? notice,
+    required String pinnedTips,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final history = await getHistory();
@@ -24,6 +25,8 @@ class FoodHistory {
       'portionSize': portionSize,
       'tip': tip,
       'notice': notice,
+      'pinnedTips': pinnedTips,
+      'timestamp': DateTime.now().toIso8601String(),
     };
 
     history.insert(0, fullEntry);

@@ -17,7 +17,6 @@ Bruschetta
 Cabbage roll
 Caesar salad
 Caprese salad
-Carrot
 Cherry
 Chicken breast
 Chicken curry
@@ -37,24 +36,28 @@ Ginataang kalabasa
 Grapes
 Greek salad
 Guacamole
+Kimchi
 Kiwi
 Lumpia
-Mango
+Melon
 Monggo
 Mooncake
 Muffin
 Mussels
+Nilagang baka
 Oatmeal
-Omelette
 Orange
 Pancake
+Pancit
 Pandesal
 Papaya
 Pineapple
 Popcorn
+Pork adobo
 Pork chop
 Raisin bread
 Rice
+Riped mango
 Roast chicken
 Sashimi
 Scrambled egg
@@ -65,16 +68,13 @@ Steamed dumpling
 Stinky tofu
 Strawberry
 Sunny side up
-Sushi
 Sweet potato
-Toast
 Togue
-Tomatoes
 Tortang talong
 Tuna salad
 Tuna tartare
 Udon noodle
 Waffle
 Watermelon
-Yeast bread
+Wheat bread
 Yogurt

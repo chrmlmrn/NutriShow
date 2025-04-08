@@ -69,32 +69,32 @@ class DatabaseHelper {
     required Map<String, dynamic> recommendedRow,
     required String gender,
     required String activity,
-    String? portionSize,  // <-- new parameter
+    String? portionSize,
   }) {
     String g = gender.toLowerCase().startsWith("m") ? "m" : "f";
     String a = activity.toLowerCase().contains("sedentary")
         ? "s"
-        : activity.toLowerCase().contains("moderately")
+        : activity.toLowerCase().contains("moderate")
         ? "ma"
         : "a";
 
     final nutrients = {
-      "Energy": ["energy_kcal", "energy_${g}_$a", "kcal"],
-      "Protein": ["protein_g", "protein_$g", "g"],
-      "Carbohydrates": ["carbohydrates_g", "carbohydrates_${g}_${a}_min", "g"],
-      "Fiber": ["fiber_g", "fiber_min", "g"],
-      "Total Sugars": ["total_sugars_g", "total_sugars_${g}_$a", "g"],
-      "Total Fat": ["total_fat_g", "total_fat_${g}_${a}_max", "g"],
+      "Energy": ["energy_kcal", "energy", "kcal"],
+      "Protein": ["protein_g", "protein", "g"],
+      "Carbohydrates": ["carbohydrates_g", "carbohydrates", "g"],
+      "Fiber": ["fiber_g", "fiber", "g"],
+      "Total Sugars": ["total_sugars_g", "total_sugars", "g"],
+      "Total Fat": ["total_fat_g", "total_fat", "g"],
       "Sodium": ["sodium_mg", "sodium", "mg"],
-      "Iron": ["iron_mg", "iron_$g", "mg"],
-      "Zinc": ["zinc_mg", "zinc_$g", "mg"],
-      "Vitamin C": ["vitamin_c_mg", "vitamin_c_$g", "mg"],
-      "Vitamin B6": ["vitamin_b6_mg", "vitamin_b6_$g", "mg"],
-      "Folate": ["folate_ug", "folate_$g", "mcg"],
-      "Vitamin A": ["vitamin_a_ug", "vitamin_a_$g", "μg"],
-      "Vitamin E": ["vitamin_e_mg", "vitamin_e_$g", "mg"],
-      "Vitamin K": ["vitamin_k_ug", "vitamin_k_$g", "μg"],
-      "Calcium": ["calcium_mg", "calcium_$g", "mg"],
+      "Iron": ["iron_mg", "iron", "mg"],
+      "Zinc": ["zinc_mg", "zinc", "mg"],
+      "Vitamin C": ["vitamin_c_mg", "vitamin_c", "mg"],
+      "Vitamin B6": ["vitamin_b6_mg", "vitamin_b6", "mg"],
+      "Folate": ["folate_ug", "folate", "mcg"],
+      "Vitamin A": ["vitamin_a_ug", "vitamin_a", "μg"],
+      "Vitamin E": ["vitamin_e_mg", "vitamin_e", "mg"],
+      "Vitamin K": ["vitamin_k_ug", "vitamin_k", "μg"],
+      "Calcium": ["calcium_mg", "calcium", "mg"],
       "Potassium": ["potassium_mg", "potassium", "mg"],
     };
 
@@ -115,25 +115,61 @@ class DatabaseHelper {
     List<String> lacking = [];
     List<String> tooMuch = [];
 
-    nutrients.forEach((label, cols) {
-      String foodKey = cols[0];
-      String recKey = cols[1];
-      String unit = cols[2];
+    nutrients.forEach((label, values) {
+      final foodKey = values[0];
+      final baseKey = values[1];
+      final unit = values[2];
 
       double foodVal = double.tryParse("${foodData[foodKey]}".replaceAll("<", "").trim()) ?? 0;
-      double recVal = double.tryParse("${recommendedRow[recKey]}".replaceAll("<", "").trim()) ?? 0;
-
-      // ✅ Adjust for portion
       foodVal *= multiplier;
 
-      if (recVal <= 0) return;
+      String? minKey = [
+        "${baseKey}_${g}_${a}_min",
+        "${baseKey}_${g}_s_min",
+        "${baseKey}_${g}_ma_min",
+        "${baseKey}_${g}_a_min",
+        "${baseKey}_${g}_min",
+        "${baseKey}_min"
+      ].firstWhere((k) => recommendedRow[k] != null, orElse: () => "");
 
-      double diff = foodVal - recVal;
+      String? maxKey = [
+        "${baseKey}_${g}_${a}_max",
+        "${baseKey}_${g}_s_max",
+        "${baseKey}_${g}_ma_max",
+        "${baseKey}_${g}_a_max",
+        "${baseKey}_${g}_max",
+        "${baseKey}_max"
+      ].firstWhere((k) => recommendedRow[k] != null, orElse: () => "");
 
-      if (diff < -0.3 * recVal) {
-        lacking.add("$label (−${diff.abs().toStringAsFixed(1)}$unit)");
-      } else if (diff > 0.3 * recVal) {
-        tooMuch.add("$label (+${diff.toStringAsFixed(1)}$unit)");
+
+      if (minKey.isNotEmpty && maxKey.isNotEmpty) {
+        double minVal = double.tryParse("${recommendedRow[minKey]}".replaceAll("<", "")) ?? 0;
+        double maxVal = double.tryParse("${recommendedRow[maxKey]}".replaceAll("<", "")) ?? 0;
+        if (foodVal < minVal) {
+          lacking.add("$label (−${(minVal - foodVal).toStringAsFixed(1)}$unit)");
+        } else if (foodVal > maxVal) {
+          tooMuch.add("$label (+${(foodVal - maxVal).toStringAsFixed(1)}$unit)");
+        }
+      } else {
+        String? singleKey = [
+          "${baseKey}_${g}_${a}",
+          "${baseKey}_${g}_s",
+          "${baseKey}_${g}_ma",
+          "${baseKey}_${g}_a",
+          "${baseKey}_${g}",
+          baseKey
+        ].firstWhere((k) => recommendedRow[k] != null, orElse: () => "");
+        if (singleKey.isNotEmpty) {
+          double recVal = double.tryParse("${recommendedRow[singleKey]}".replaceAll("<", "")) ?? 0;
+          if (recVal > 0) {
+            double diff = foodVal - recVal;
+            if (diff < -0.3 * recVal) {
+              lacking.add("$label (−${diff.abs().toStringAsFixed(1)}$unit)");
+            } else if (diff > 0.3 * recVal) {
+              tooMuch.add("$label (+${diff.toStringAsFixed(1)}$unit)");
+            }
+          }
+        }
       }
     });
 
@@ -143,33 +179,26 @@ class DatabaseHelper {
     };
   }
 
-
   Future<String> queryPortionType(String foodId) async {
     final db = await database;
 
-    // Query the portion type for the foodId (e.g., 'nf_001')
     var result = await db.rawQuery(
       '''
-    SELECT portion
-    FROM food_servings
-    WHERE food_uid = ?
-    ''',
+      SELECT portion
+      FROM food_servings
+      WHERE food_uid = ?
+      ''',
       [foodId],
     );
 
-    // Debug: Print the result of the query
-    print("Query result for foodId ($foodId): $result");
+    print("Query result for foodId (\$foodId): \$result");
 
-    // Check if the result is not empty and return the portion
     if (result.isNotEmpty && result.first['portion'] != null) {
       return result.first['portion'] as String;
     } else {
-      throw Exception("Portion not found for food ID: $foodId");
+      throw Exception("Portion not found for food ID: \$foodId");
     }
   }
-
-
-
 }
 
 extension StringExtension on String {

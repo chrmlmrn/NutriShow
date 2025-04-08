@@ -14,13 +14,14 @@ import 'package:image/image.dart' as img;
 class DishOptionsScreen extends StatefulWidget {
   final int age;
   final String gender;
-  final String activity;
+  final String activityLevel;
 
   const DishOptionsScreen({
     super.key,
     required this.age,
     required this.gender,
-    required this.activity,});
+    required this.activityLevel,
+  });
 
   @override
   _DishOptionsScreenState createState() => _DishOptionsScreenState();
@@ -292,7 +293,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     if (foodDetails != null) {
       int userAge = widget.age;
       String userGender = widget.gender;
-      String userActivity = widget.activity;
+      String userActivity = widget.activityLevel;
 
       Map<String, dynamic> recommendedRow = await dbHelper.getRecommendedIntakeRow(userAge);
 
@@ -433,7 +434,9 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       }
 
       await FoodHistory.addToHistory(
-        foodDetails: foodDetails,
+        foodDetails: {
+          ...foodDetails,
+          'activity_level': userActivity},
         assessment: assessment,
         recommendedIntake: recommendedRow,
         gender: userGender,
@@ -455,6 +458,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
             tip: selectedTip,
             notice: selectedNotice,
             pinnedTips: pinnedTips,
+            activityLevel: widget.activityLevel,
           ),
         ),
       );

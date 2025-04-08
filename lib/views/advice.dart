@@ -12,6 +12,8 @@ class MacronutrientAdvicePage extends StatelessWidget {
   final String? portionSize;
   final String? tip;
   final String? notice;
+  final String activityLevel;
+
 
   const MacronutrientAdvicePage({
     super.key,
@@ -23,6 +25,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
     this.tip,
     this.notice,
     this.pinnedTips,
+    required this.activityLevel,
   });
 
   double _adjustForPortion(dynamic value) {
@@ -47,6 +50,36 @@ class MacronutrientAdvicePage extends StatelessWidget {
     // Otherwise, treat it as a regular number
     double portionMultiplier = double.tryParse(portionSize!) ?? 1;
     return nutrientValue * portionMultiplier;
+  }
+
+  String? _getRecommendedKey(
+      String nutrient, String gender, String activity, Map<String, dynamic> row) {
+    final g = gender.toLowerCase().startsWith("m") ? "m" : "f";
+    final a = activity.toLowerCase().contains("sedentary")
+        ? "s"
+        : activity.toLowerCase().contains("moderately active")
+        ? "ma"
+        : "a";
+
+    final keys = [
+      "${nutrient}_${g}_${a}_min",
+      "${nutrient}_${g}_s_min",
+      "${nutrient}_${g}_ma_min",
+      "${nutrient}_${g}_a_min",
+      "${nutrient}_${g}_min",
+      "${nutrient}_min",
+      "${nutrient}_${g}_${a}_max",
+      "${nutrient}_${g}_s_max",
+      "${nutrient}_${g}_ma_max",
+      "${nutrient}_${g}_a_max",
+      "${nutrient}_${g}_max",
+      "${nutrient}_max",
+      "${nutrient}_${g}_${a}",
+      "${nutrient}_${g}",
+      nutrient,
+    ];
+
+    return keys.firstWhere((k) => row[k] != null, orElse: () => '');
   }
 
   List<Widget> _buildPinnedAdvice() {
@@ -129,6 +162,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
       pins.add("\uD83D\uDCCC ${fatsLack[rand.nextInt(5)]}");
     }
 
+
     return pins.map((msg) => Padding(
       padding: const EdgeInsets.only(bottom: 6.0),
       child: Text(
@@ -142,8 +176,25 @@ class MacronutrientAdvicePage extends StatelessWidget {
     )).toList();
   }
 
+  String _formatValue(num value) {
+    if (portionSize != null) {
+      if (portionSize!.contains('.') || portionSize!.contains('/')) {
+        return value.toStringAsFixed(2);
+      } else {
+        final portionNumber = double.tryParse(portionSize!);
+        if (portionNumber != null && portionNumber % 1 != 0) {
+          return value.toStringAsFixed(2);
+        }
+      }
+    }
+    return value.toStringAsFixed(0); // Whole number if portion is whole
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    print("Activity Level received: $activityLevel");
+
     final adjustedFoodDetails = {
       for (final entry in foodDetails.entries)
         entry.key: entry.value is num ? _adjustForPortion(entry.value) : entry.value,
@@ -390,7 +441,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
                     const SizedBox(height: 10),
                     if (recommendedIntake != null)
                       ...[
-                        ..._buildRecommendedIntakeList(recommendedIntake!)
+                        ..._buildRecommendedIntakeList(recommendedIntake!, activityLevel)
                       ]
                     else
                       Text("• Not available", style: GoogleFonts.nunito(fontSize: 16.5)),
@@ -510,7 +561,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
             style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.w500),
           ),
           Text(
-              "${(value as num?)?.toStringAsFixed(2) ?? 'Unknown'} $unit",
+              "${(value != null) ? _formatValue(value as num) : 'Unknown'} $unit",
               style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.blueGrey),
           ),
         ],
@@ -529,8 +580,8 @@ class MacronutrientAdvicePage extends StatelessWidget {
             style: GoogleFonts.nunito(fontSize: 16.5, fontStyle: FontStyle.italic),
           ),
           Text(
-            "${(value as num?)?.toStringAsFixed(2) ?? 'Unknown'} $unit",
-            style: GoogleFonts.nunito(fontSize: 16.5, color: Colors.blueGrey),
+              "${(value != null) ? _formatValue(value as num) : 'Unknown'} $unit",
+              style: GoogleFonts.nunito(fontSize: 16.5, color: Colors.blueGrey),
           ),
         ],
       ),
@@ -555,45 +606,55 @@ class MacronutrientAdvicePage extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildRecommendedIntakeList(Map<String, dynamic> intake) {
+  List<Widget> _buildRecommendedIntakeList(Map<String, dynamic> intake, String activityLevel) {
     final isMale = gender?.toLowerCase().startsWith('m') ?? true;
 
+    final raw = activityLevel.toLowerCase();
+    final actCode = raw.contains('sedentary')
+        ? 's'
+        : raw.contains('moderately')
+        ? 'ma'
+        : 'a';
+
+    final g = isMale ? 'm' : 'f';
+
     final nutrientsToShow = {
-      "energy_${isMale ? 'm' : 'f'}_a": ["Energy", "kcal"],
-      "protein_${isMale ? 'm' : 'f'}": ["Protein", "g"],
-      "carbohydrates_${isMale ? 'm' : 'f'}_a_min": ["Carbohydrates", "g"],
+      "energy_${g}_$actCode": ["Energy", "kcal"],
+      "protein_$g": ["Protein", "g"],
+      "carbohydrates_${g}_${actCode}_min": ["Carbohydrates", "g"],
       "fiber_min": ["Fiber", "g"],
-      "total_sugars_${isMale ? 'm' : 'f'}_a": ["Total Sugars", "g"],
-      "total_fat_${isMale ? 'm' : 'f'}_a_max": ["Total Fat", "g"],
+      "total_sugars_${g}_$actCode": ["Total Sugars", "g"],
+      "total_fat_${g}_${actCode}_max": ["Total Fat", "g"],
       "sodium": ["Sodium", "mg"],
-      "iron_${isMale ? 'm' : 'f'}": ["Iron", "mg"],
-      "zinc_${isMale ? 'm' : 'f'}": ["Zinc", "mg"],
-      "vitamin_c_${isMale ? 'm' : 'f'}": ["Vitamin C", "mg"],
-      "vitamin_b6_${isMale ? 'm' : 'f'}": ["Vitamin B6", "mg"],
-      "folate_${isMale ? 'm' : 'f'}": ["Folate", "μg"],
-      "vitamin_a_${isMale ? 'm' : 'f'}": ["Vitamin A", "μg"],
-      "vitamin_e_${isMale ? 'm' : 'f'}": ["Vitamin E", "mg"],
-      "vitamin_k_${isMale ? 'm' : 'f'}": ["Vitamin K", "μg"],
-      "calcium_${isMale ? 'm' : 'f'}": ["Calcium", "mg"],
+      "iron_$g": ["Iron", "mg"],
+      "zinc_$g": ["Zinc", "mg"],
+      "vitamin_c_$g": ["Vitamin C", "mg"],
+      "vitamin_b6_$g": ["Vitamin B6", "mg"],
+      "folate_$g": ["Folate", "μg"],
+      "vitamin_a_$g": ["Vitamin A", "μg"],
+      "vitamin_e_$g": ["Vitamin E", "mg"],
+      "vitamin_k_$g": ["Vitamin K", "μg"],
+      "calcium_$g": ["Calcium", "mg"],
       "potassium": ["Potassium", "mg"],
     };
 
     return nutrientsToShow.entries.map((entry) {
       final value = intake[entry.key];
-      final nutrientName = entry.value[0];
+      final nutrient = entry.value[0];
       final unit = entry.value[1];
-
-      final formattedValue = (value is num) ? value.toStringAsFixed(2) : (value ?? '—');
+      final formattedValue = (value is num) ? value.toStringAsFixed(2) : '—';
 
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 2.0),
         child: Text(
-          "• $nutrientName: $formattedValue $unit",
+          "• $nutrient: $formattedValue $unit",
           style: GoogleFonts.nunito(fontSize: 16.5),
         ),
       );
     }).toList();
   }
+
+
 
 
   String _calculateTotalGrams() {
@@ -613,7 +674,22 @@ class MacronutrientAdvicePage extends StatelessWidget {
       }
     }
 
-    return (baseServing * multiplier).toStringAsFixed(1);
+    double totalGrams = baseServing * multiplier;
+
+    // Format based on portion format
+    bool showDecimal = false;
+    if (portionSize != null) {
+      if (portionSize!.contains(".") || portionSize!.contains("/")) {
+        showDecimal = true;
+      } else {
+        final parsed = double.tryParse(portionSize!);
+        if (parsed != null && parsed % 1 != 0) {
+          showDecimal = true;
+        }
+      }
+    }
+
+    return showDecimal ? totalGrams.toStringAsFixed(2) : totalGrams.toStringAsFixed(0);
   }
 
 }

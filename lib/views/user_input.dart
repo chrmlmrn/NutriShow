@@ -144,7 +144,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                     MaterialPageRoute(builder: (context) => DishOptionsScreen(
                       age: int.parse(_ageController.text),
                       gender: _selectedGender!,
-                      activity: _selectedActivityLevel!,
+                      activityLevel: _selectedActivityLevel!,
                     ),
                   ),
                   );

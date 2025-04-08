@@ -149,7 +149,8 @@ class FoodHistoryPage extends StatelessWidget {
                                   gender: gender,
                                   portionSize: item['portionSize'],
                                   pinnedTips: (item['pinnedTips'] as String?)?.split('|'),
-                                  notice: item['notice'], // NEW
+                                  notice: item['notice'],
+                                  activityLevel: foodDetails['activity_level'] ?? 'active',
                                 ),
                               ),
                             );

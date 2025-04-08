@@ -103,7 +103,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
 
       // Fetch the portion type after the food detection
       String portionType = await _getPortionTypeFromDatabase(foodName);
-      print("Portion type: $portionType");
+      print("Portion Size: $portionType");
 
     } catch (e) {
       print("Error during inference: $e");
@@ -195,7 +195,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Portion Type: 1 $portionType"),
+              Text("Portion Size: 1 $portionType"),
               if (servingSize > 0)
                 Text("Amount: $servingSize g"),
               const SizedBox(height: 9),
@@ -394,6 +394,16 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         ][Random().nextInt(5)]}");
       }
 
+      if (tooMuch.any((e) => e.toLowerCase().contains("sodium"))) {
+        pinnedTips.add("📌 ${[
+          "Excess sodium detected—try to cut back on processed or salty items.",
+          "You’ve exceeded the recommended sodium levels—moderate your salt intake.",
+          "Sodium levels are above the healthy limit—watch your salt intake.",
+          "High sodium intake may lead to health risks—adjust your diet accordingly.",
+          "You're consuming more sodium than needed—aim to reduce it."
+        ][Random().nextInt(5)]}");
+      }
+
       if (lacking.any((e) => e.toLowerCase().contains("protein"))) {
         pinnedTips.add("📌 ${[
           "Your protein intake is lower than recommended—try to include more in your diet.",
@@ -474,7 +484,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         title: Center(
           child: Text(
             'Dish Classification',
-            style: GoogleFonts.nunito(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
+            style: GoogleFonts.nunito(fontSize: 27, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
           ),
         ),
         actions: [
@@ -490,115 +500,126 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.only(top: 65, left: 20, right: 20, bottom: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Align(
-                alignment: Alignment.center, // Center the image container
-                child: Container(
-                  height: 250,
-                  width: 250,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Color(0xFF0E4A06), width: 2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: _image != null
-                      ? ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.file(
-                      File(_image!.path),
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                      : const Center(
-                    child: Text(
-                      "No image selected",
-                      style: TextStyle(fontSize: 16, color: Colors.black54),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 25),
-              if (_foodResult != null)
-                Text(
-                  _foodResult!,
-                  style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: Colors.black87),
-                  textAlign: TextAlign.center,
-                ),
-              const SizedBox(height: 6),
-              if (_portionSize != null)
-                Text(
-                  "Portion: $_portionSize",
-                  style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black54),
-                ),
-              const SizedBox(height: 35),
-              Column(
-                mainAxisSize: MainAxisSize.min, // Ensure all buttons stack up and are centered
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: _takePhoto,
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text("Take a Photo"),
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
-                        backgroundColor: Color(0xFFABCB4D),
-                        foregroundColor: Color(0xFF0E4A06)
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  ElevatedButton.icon(
-                    onPressed: _uploadDish,
-                    icon: const Icon(Icons.upload),
-                    label: const Text("Upload from Gallery"),
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                        backgroundColor: Color(0xFFABCB4D),
-                        foregroundColor: Color(0xFF0E4A06)
-                    ),
-                  ),
-                  const SizedBox(height: 17),
-                  ElevatedButton.icon(
-                    onPressed: _foodId != null ? _showPortionInputDialog : null, // Only allow showing dialog if foodId is set
-                    icon: const Icon(Icons.edit),
-                    label: const Text("Enter Portion"),
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
-                        backgroundColor: Color(0xFFABCB4D),
-                        foregroundColor: Color(0xFF0E4A06)
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  if (_portionSize == null || _portionSize!.isEmpty)
-                    Text(
-                      "Please enter portion size before viewing result.",
-                      style: TextStyle(color: Colors.red.shade700, fontStyle: FontStyle.italic),
-                    ),
-                  const SizedBox(height: 3),
-                  ElevatedButton.icon(
-                    onPressed: (_foodResult != null && !_foodResult!.contains("Error") && _portionSize != null && _portionSize!.isNotEmpty)
-                        ? _getAdvice
-                        : null,
-                    icon: const Icon(Icons.insights),
-                    label: const Text("View Result"),
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/screensbg.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(top: 65, left: 20, right: 20, bottom: 30),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.center, // Center the image container
+                    child: Container(
+                      height: 250,
+                      width: 250,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Color(0xFF5D8736), width: 2),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 55, vertical: 14),
-                      backgroundColor: Color(0xFF5D8736),
-                      foregroundColor: Color(0xFFF4FFC3),
+                      child: _image != null
+                          ? ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.file(
+                          File(_image!.path),
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                          : const Center(
+                        child: Text(
+                          "No image selected",
+                          style: TextStyle(fontSize: 16, color: Colors.black54),
+                        ),
+                      ),
                     ),
+                  ),
+                  const SizedBox(height: 25),
+                  if (_foodResult != null)
+                    Text(
+                      _foodResult!,
+                      style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: Colors.black87),
+                      textAlign: TextAlign.center,
+                    ),
+                  const SizedBox(height: 6),
+                  if (_portionSize != null)
+                    Text(
+                      "Portion: $_portionSize",
+                      style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black54),
+                    ),
+                  const SizedBox(height: 35),
+                  Column(
+                    mainAxisSize: MainAxisSize.min, // Ensure all buttons stack up and are centered
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: _takePhoto,
+                        icon: const Icon(Icons.camera_alt),
+                        label: const Text("Take a Photo"),
+                        style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
+                            backgroundColor: Color(0xFFABCB4D),
+                            foregroundColor: Color(0xFF0E4A06)
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      ElevatedButton.icon(
+                        onPressed: _uploadDish,
+                        icon: const Icon(Icons.upload),
+                        label: const Text("Upload from Gallery"),
+                        style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                            backgroundColor: Color(0xFFABCB4D),
+                            foregroundColor: Color(0xFF0E4A06)
+                        ),
+                      ),
+                      const SizedBox(height: 17),
+                      ElevatedButton.icon(
+                        onPressed: _foodId != null ? _showPortionInputDialog : null, // Only allow showing dialog if foodId is set
+                        icon: const Icon(Icons.edit),
+                        label: const Text("Enter Portion"),
+                        style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
+                            backgroundColor: Color(0xFFABCB4D),
+                            foregroundColor: Color(0xFF0E4A06)
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      if (_portionSize == null || _portionSize!.isEmpty)
+                        Text(
+                          "Please enter portion size before viewing result.",
+                          style: TextStyle(color: Colors.red.shade700, fontStyle: FontStyle.italic),
+                        ),
+                      const SizedBox(height: 3),
+                      ElevatedButton.icon(
+                        onPressed: (_foodResult != null && !_foodResult!.contains("Error") && _portionSize != null && _portionSize!.isNotEmpty)
+                            ? _getAdvice
+                            : null,
+                        icon: const Icon(Icons.insights),
+                        label: const Text("View Result"),
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 55, vertical: 14),
+                          backgroundColor: Color(0xFF5D8736),
+                          foregroundColor: Color(0xFFF4FFC3),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        ],
+      )
     );
   }
 }

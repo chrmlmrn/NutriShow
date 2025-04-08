@@ -182,274 +182,298 @@ class _UserInputScreenState extends State<UserInputScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF9FEEB),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            const SizedBox(height: 50),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/logo.png',
-                  height: 70,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+            Positioned.fill(
+              child: Image.asset(
+                'assets/screensbg.png',
+                fit: BoxFit.cover,
+              ),
+          ),
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox(height: 50),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/logo.png',
+                      height: 70,
+                    ),
+                    const SizedBox(width: 15),
+                    Text(
+                      'NutriShow',
+                      style: GoogleFonts.changaOne(
+                        fontSize: 50,
+                        color: Color(0xFF0E4A06), // Adjust color to fit your theme
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 15),
+                const SizedBox(height: 60),
                 Text(
-                  'NutriShow',
-                  style: GoogleFonts.changaOne(
-                    fontSize: 50,
-                    color: Color(0xFF0E4A06), // Adjust color to fit your theme
+                  'User Metrics',
+                  style: GoogleFonts.nunito(
+                    fontSize: 34.5,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0E4A06),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 60),
-            Text(
-              'User Metrics',
-              style: GoogleFonts.nunito(
-                fontSize: 34.5,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF0E4A06),
-              ),
-            ),
-            const SizedBox(height: 35),
-            TextField(
-              controller: _ageController,
-              keyboardType: TextInputType.number, // Allows only numeric input
-              decoration: InputDecoration(
-                labelText: 'Age',
-                labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-            DropdownButtonFormField<String>(
-              value: _selectedGender,
-              items: _genders
-                  .map((gender) => DropdownMenuItem(
-                value: gender,
-                child: Text(gender),
-              ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedGender = value;
-                });
-              },
-              decoration: InputDecoration(
-                labelText: 'Gender',
-                labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _weightController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: _isKg ? 'Weight (kg)' : 'Weight (lbs)',
-                      labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
-                      ),
+                const SizedBox(height: 35),
+                TextField(
+                  controller: _ageController,
+                  keyboardType: TextInputType.number, // Allows only numeric input
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Color(0xFFF9FEED),
+                    labelText: 'Age',
+                    labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                ToggleButtons(
-                  isSelected: [_isKg, !_isKg],
-                  onPressed: _toggleWeightUnit,
-                  borderRadius: BorderRadius.circular(5), // Makes it rounder
-                  selectedBorderColor: Color(0xFF0E4A06), // Border color when selected
-                  borderColor: Color(0xFFAAD3C4), // Border color when unselected
-                  fillColor: Color(0xFFABCB4D), // Background color when selected
-                  selectedColor: Color(0xFF0E4A06), // Text color when selected
-                  color: Colors.black, // Text color when unselected
-                  children: const [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text("kg"),
+                const SizedBox(height: 28),
+                DropdownButtonFormField<String>(
+                  value: _selectedGender,
+                  items: _genders
+                      .map((gender) => DropdownMenuItem(
+                    value: gender,
+                    child: Text(gender),
+                  ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedGender = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Color(0xFFF9FEED),
+                    labelText: 'Gender',
+                    labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
                     ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text("lbs"),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
                     ),
-                  ],
+                  ),
+                ),
+                const SizedBox(height: 28),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _weightController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Color(0xFFF9FEED),
+                          labelText: _isKg ? 'Weight (kg)' : 'Weight (lbs)',
+                          labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                            borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                            borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ToggleButtons(
+                      isSelected: [_isKg, !_isKg],
+                      onPressed: _toggleWeightUnit,
+                      borderRadius: BorderRadius.circular(5), // Makes it rounder
+                      selectedBorderColor: Color(0xFF0E4A06), // Border color when selected
+                      borderColor: Color(0xFFAAD3C4), // Border color when unselected
+                      fillColor: Color(0xFFABCB4D), // Background color when selected
+                      selectedColor: Color(0xFF0E4A06), // Text color when selected
+                      color: Colors.black, // Text color when unselected
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Text("kg"),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Text("lbs"),
+                        ),
+                      ],
 
-                ),
-              ],
-            ),
-            const SizedBox(height: 28),
-            Row(
-              children: [
-                Expanded(
-                  child: _isCm
-                      ? TextField(
-                    controller: _heightCmController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: 'Height (cm)',
-                      labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2), // Border when focused
-                      ),
-                    ),
-                  )
-                      : Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _heightFeetController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'Feet',
-                            labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                              borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                              borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2), // Border when focused
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: TextField(
-                          controller: _heightInchesController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'Inches',
-                            labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                              borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                              borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2), // Border when focused
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ToggleButtons(
-                  isSelected: [_isCm, !_isCm],
-                  onPressed: _toggleHeightUnit,
-                  borderRadius: BorderRadius.circular(5), // Makes it rounder
-                  selectedBorderColor: Color(0xFF0E4A06), // Border color when selected
-                  borderColor: Color(0xFFAAD3C4), // Border color when unselected
-                  fillColor: Color(0xFFABCB4D), // Background color when selected
-                  selectedColor: Color(0xFF0E4A06), // Text color when selected
-                  color: Colors.black, // Text color when unselected
-                  children: const [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text("cm"),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text("ft/in"),
                     ),
                   ],
                 ),
+                const SizedBox(height: 28),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _isCm
+                          ? TextField(
+                        controller: _heightCmController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Color(0xFFF9FEED),
+                          labelText: 'Height (cm)',
+                          labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                            borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                            borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2), // Border when focused
+                          ),
+                        ),
+                      )
+                          : Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _heightFeetController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Color(0xFFF9FEED),
+                                labelText: 'Feet',
+                                labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                  borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                  borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2), // Border when focused
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: TextField(
+                              controller: _heightInchesController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Color(0xFFF9FEED),
+                                labelText: 'Inches',
+                                labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                  borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                  borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2), // Border when focused
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ToggleButtons(
+                      isSelected: [_isCm, !_isCm],
+                      onPressed: _toggleHeightUnit,
+                      borderRadius: BorderRadius.circular(5), // Makes it rounder
+                      selectedBorderColor: Color(0xFF0E4A06), // Border color when selected
+                      borderColor: Color(0xFFAAD3C4), // Border color when unselected
+                      fillColor: Color(0xFFABCB4D), // Background color when selected
+                      selectedColor: Color(0xFF0E4A06), // Text color when selected
+                      color: Colors.black, // Text color when unselected
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Text("cm"),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Text("ft/in"),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 28),
+                DropdownButtonFormField<String>(
+                  value: _selectedActivityLevel,
+                  isExpanded: true,
+                  menuMaxHeight: 300,
+                  items: _activityLevelsWithDescriptions.entries.map((entry) {
+                    return DropdownMenuItem(
+                      value: entry.key,
+                      child: ListTile(
+                        title: Text(entry.key), // Show only the title in the dropdown list
+                        subtitle: Text(entry.value), // Show subtitle inside the dropdown
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedActivityLevel = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Color(0xFFF9FEED),
+                    labelText: 'Activity Level',
+                    labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
+                    ),
+                  ),
+                  selectedItemBuilder: (context) => _activityLevelsWithDescriptions.keys.map((title) {
+                    return Text(
+                      title, // Only display the main title in the dropdown button (prevents overflow)
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 16),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 40),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _submitData,
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 65, vertical: 14),
+                      backgroundColor: Color(0xFF5D8736),
+                      foregroundColor: Color(0xFFF4FFC3),
+                    ),
+                    child: Text(
+                      "Submit",
+                      style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 28),
-            DropdownButtonFormField<String>(
-              value: _selectedActivityLevel,
-              isExpanded: true,
-              menuMaxHeight: 300,
-              items: _activityLevelsWithDescriptions.entries.map((entry) {
-                return DropdownMenuItem(
-                  value: entry.key,
-                  child: ListTile(
-                    title: Text(entry.key), // Show only the title in the dropdown list
-                    subtitle: Text(entry.value), // Show subtitle inside the dropdown
-                  ),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedActivityLevel = value;
-                });
-              },
-              decoration: InputDecoration(
-                labelText: 'Activity Level',
-                labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
-                ),
-              ),
-              selectedItemBuilder: (context) => _activityLevelsWithDescriptions.keys.map((title) {
-                return Text(
-                  title, // Only display the main title in the dropdown button (prevents overflow)
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 16),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 40),
-            Center(
-              child: ElevatedButton(
-                onPressed: _submitData,
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 65, vertical: 14),
-                  backgroundColor: Color(0xFF5D8736),
-                  foregroundColor: Color(0xFFF4FFC3),
-                ),
-                child: Text(
-                  "Submit",
-                  style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        ],
+      )
     );
   }
 }

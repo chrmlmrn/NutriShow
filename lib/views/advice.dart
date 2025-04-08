@@ -48,6 +48,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
     double portionMultiplier = double.tryParse(portionSize!) ?? 1;
     return nutrientValue * portionMultiplier;
   }
+
   List<Widget> _buildPinnedAdvice() {
     final tooMuch = assessment?['too_much'] as List? ?? [];
     final lacking = assessment?['lacking'] as List? ?? [];
@@ -74,6 +75,13 @@ class MacronutrientAdvicePage extends StatelessWidget {
       "Fat intake should be moderated—consider choosing low-fat alternatives.",
       "You’ve gone past the ideal fat intake—scale it down to improve balance.",
       "Fat intake exceeded the recommended amount—moderate it accordingly.",
+    ];
+    final sodiumTooMuch = [
+      "Excess sodium detected—try to cut back on processed or salty items.",
+      "You’ve exceeded the recommended sodium levels—moderate your salt intake.",
+      "Sodium levels are above the healthy limit—watch your salt intake.",
+      "High sodium intake may lead to health risks—adjust your diet accordingly.",
+      "You're consuming more sodium than needed—aim to reduce it."
     ];
 
     final proteinLack = [
@@ -107,6 +115,9 @@ class MacronutrientAdvicePage extends StatelessWidget {
     if (tooMuch.any((e) => e.toLowerCase().contains("fat"))) {
       pins.add("\uD83D\uDCCC ${fatsTooMuch[rand.nextInt(5)]}");
     }
+    if (tooMuch.any((e) => e.toLowerCase().contains("sodium"))) {
+      pins.add("\uD83D\uDCCC ${sodiumTooMuch[rand.nextInt(5)]}");
+    }
 
     if (lacking.any((e) => e.toLowerCase().contains("protein"))) {
       pins.add("\uD83D\uDCCC ${proteinLack[rand.nextInt(5)]}");
@@ -125,7 +136,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
         style: GoogleFonts.nunito(
           fontSize: 16.5,
           fontStyle: FontStyle.italic,
-          color: Colors.deepOrange,
+          color: Color(0xFFcf2400),
         ),
       ),
     )).toList();
@@ -167,7 +178,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
         iconTheme: IconThemeData(color: Color(0xFF0E4A06), size: 30),
         title: Text(
           'Dietary Assessment',
-          style: GoogleFonts.nunito(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
+          style: GoogleFonts.nunito(fontSize: 26, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
         ),
         actions: [
           IconButton(
@@ -202,7 +213,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 6.0),
                   child: Text(
-                    "Portion: $portionSize serving(s) • ${_calculateTotalGrams()} grams",
+                    "$portionSize portion(s) • ${_calculateTotalGrams()} grams",
                     style: GoogleFonts.nunito(
                       fontSize: 17,
                       fontStyle: FontStyle.italic,
@@ -215,7 +226,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeaderRow("🔥 Calories", "${_adjustForPortion(foodDetails['energy_kcal'] ?? 0)} kcal"),
+                    _buildHeaderRow("🔥 Calories", "${_adjustForPortion(foodDetails['energy_kcal'] ?? 0).toStringAsFixed(2)} kcal"),
                     SizedBox(height: 10),
                     _buildNutrientRow("🍗 Protein", _adjustForPortion(foodDetails['protein_g'] ?? 0), "g"),
                     _buildNutrientRow("🍞 Total Carbohydrates", _adjustForPortion(foodDetails['carbohydrates_g'] ?? 0), "g"),
@@ -257,7 +268,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
                         color: Color(0xFF4A6FA5),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 15),
                     if (notice != null)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 12.0),
@@ -270,6 +281,8 @@ class MacronutrientAdvicePage extends StatelessWidget {
                           ),
                         ),
                       ),
+                    const SizedBox(height: 5),
+
                     Text(
                       "Too much nutrients (${(assessment?['too_much'] as List?)?.length ?? 0}):",
                       style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.w700),
@@ -279,13 +292,33 @@ class MacronutrientAdvicePage extends StatelessWidget {
                     else
                       ...List.generate(
                         (assessment!['too_much'] as List).length,
-                            (index) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2.0),
-                          child: Text("• ${assessment!['too_much'][index]}", style: GoogleFonts.nunito(fontSize: 16.5)),
-                        ),
+                            (index) {
+                          String item = assessment!['too_much'][index];
+
+                          if (item.contains("Vitamin B6")) {
+                            final matches = RegExp(r"(-?\d+(\.\d+)?)").allMatches(item).toList();
+
+                            if (matches.length >= 2) {
+                              double secondNumber = double.parse(matches[1].group(0)!);
+                              item = item.replaceFirst(matches[1].group(0)!, secondNumber.toStringAsFixed(2));
+                            }
+                          } else {
+                            final match = RegExp(r"(-?\d+(\.\d+)?)").firstMatch(item);
+
+                            if (match != null) {
+                              double number = double.parse(match.group(0)!);
+                              item = item.replaceFirst(match.group(0)!, number.toStringAsFixed(2));
+                            }
+                          }
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.0),
+                            child: Text("• $item", style: GoogleFonts.nunito(fontSize: 16.5)),
+                          );
+                        },
                       ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 15),
 
                     Text(
                       "Lacking nutrients (${(assessment?['lacking'] as List?)?.length ?? 0}):",
@@ -296,22 +329,34 @@ class MacronutrientAdvicePage extends StatelessWidget {
                     else
                       ...List.generate(
                         (assessment!['lacking'] as List).length,
-                            (index) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2.0),
-                          child: Text("• ${assessment!['lacking'][index]}", style: GoogleFonts.nunito(fontSize: 16.5)),
-                        ),
-                      ),
-                    const SizedBox(height: 16),
-                    Text(
-                      "Recommended Nutrient Intake:",
-                      style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(height: 4),
+                            (index) {
+                          String item = assessment!['lacking'][index];
 
+                          if (item.contains("Vitamin B6")) {
+                            final matches = RegExp(r"(-?\d+(\.\d+)?)").allMatches(item).toList();
+
+                            if (matches.length >= 2) {
+                              double secondNumber = double.parse(matches[1].group(0)!);
+                              item = item.replaceFirst(matches[1].group(0)!, secondNumber.toStringAsFixed(2));
+                            }
+                          } else {
+                            final match = RegExp(r"(-?\d+(\.\d+)?)").firstMatch(item);
+
+                            if (match != null) {
+                              double number = double.parse(match.group(0)!);
+                              item = item.replaceFirst(match.group(0)!, number.toStringAsFixed(2));
+                            }
+                          }
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.0),
+                            child: Text("• $item", style: GoogleFonts.nunito(fontSize: 16.5)),
+                          );
+                        },
+                      ),
                     if (recommendedIntake != null)
                       ...[
-                        ..._buildRecommendedIntakeList(recommendedIntake!),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 15),
                         ...(pinnedTips?.map((msg) => Padding(
                           padding: const EdgeInsets.only(bottom: 6.0),
                           child: Text(
@@ -319,10 +364,33 @@ class MacronutrientAdvicePage extends StatelessWidget {
                             style: GoogleFonts.nunito(
                               fontSize: 16.5,
                               fontStyle: FontStyle.italic,
-                              color: Colors.deepOrange,
+                              color: Color(0xFFB80000),
                             ),
                           ),
                         )).toList() ?? _buildPinnedAdvice())
+                      ]
+                    else
+                      Text("• Not available", style: GoogleFonts.nunito(fontSize: 16.5)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              _buildRecommendedIntakeCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "🍽️ Recommended Nutrient Intake per Day",
+                      style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF206C15),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    if (recommendedIntake != null)
+                      ...[
+                        ..._buildRecommendedIntakeList(recommendedIntake!)
                       ]
                     else
                       Text("• Not available", style: GoogleFonts.nunito(fontSize: 16.5)),
@@ -362,6 +430,26 @@ class MacronutrientAdvicePage extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Color(0XFFCFE3DA),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 5,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildRecommendedIntakeCard({required Widget child, Color? color, Color borderColor = const Color(0xFF206C15)}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Color(0XFFCAE0BC),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: borderColor, width: 2),
         boxShadow: [
@@ -441,7 +529,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
             style: GoogleFonts.nunito(fontSize: 16.5, fontStyle: FontStyle.italic),
           ),
           Text(
-            "${(value as num?)?.toStringAsFixed(3) ?? 'Unknown'} $unit",
+            "${(value as num?)?.toStringAsFixed(2) ?? 'Unknown'} $unit",
             style: GoogleFonts.nunito(fontSize: 16.5, color: Colors.blueGrey),
           ),
         ],
@@ -494,15 +582,19 @@ class MacronutrientAdvicePage extends StatelessWidget {
       final value = intake[entry.key];
       final nutrientName = entry.value[0];
       final unit = entry.value[1];
+
+      final formattedValue = (value is num) ? value.toStringAsFixed(2) : (value ?? '—');
+
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 2.0),
         child: Text(
-          "• $nutrientName: ${value ?? '—'} $unit",
+          "• $nutrientName: $formattedValue $unit",
           style: GoogleFonts.nunito(fontSize: 16.5),
         ),
       );
     }).toList();
   }
+
 
   String _calculateTotalGrams() {
     final baseServing = double.tryParse(foodDetails['serving_size'].toString()) ?? 0;

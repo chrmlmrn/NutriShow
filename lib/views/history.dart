@@ -22,153 +22,139 @@ class FoodHistoryPage extends StatelessWidget {
           ),
         ),
       ),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/screensbg.png',
-              fit: BoxFit.cover,
-            ),
-          ),
-          FutureBuilder<List<Map<String, dynamic>>>(  // Using FutureBuilder to load data
-            future: FoodHistory.getHistory(),  // Fetching food history from the database
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
+      body: FutureBuilder<List<Map<String, dynamic>>>(  // Using FutureBuilder to load data
+        future: FoodHistory.getHistory(),  // Fetching food history from the database
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-              if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(
-                  child: Text(
-                    "No food history yet.",
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text(
+                "No food history yet.",
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+            );
+          }
+
+          final history = snapshot.data!;
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(12),
+            itemCount: history.length,
+            itemBuilder: (context, index) {
+              final item = history[index];
+
+              // Extract stored structure
+              final foodDetails = item['foodDetails'] ?? {};
+              final assessment = item['assessment'];
+              final recommendedIntake = item['recommendedIntake'];
+              final gender = item['gender'];
+              final portionSize = double.tryParse(item['portionSize']?.toString() ?? '1') ?? 1;
+
+              // Adjust nutritional values using portion size
+              double calories = (foodDetails['energy_kcal'] ?? 0) * portionSize;
+              double protein = (foodDetails['protein_g'] ?? 0) * portionSize;
+              double carbs = (foodDetails['carbohydrates_g'] ?? 0) * portionSize;
+              double fat = (foodDetails['total_fat_g'] ?? 0) * portionSize;
+
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(28),
+                    side: BorderSide(
+                      color: Color(0xFFafb992),
+                      width: 2,
+                    ),
                   ),
-                );
-              }
-
-              final history = snapshot.data!;
-
-              return ListView.builder(
-                padding: const EdgeInsets.all(12),
-                itemCount: history.length,
-                itemBuilder: (context, index) {
-                  final item = history[index];
-
-                  // Extract stored structure
-                  final foodDetails = item['foodDetails'] ?? {};
-                  final assessment = item['assessment'];
-                  final recommendedIntake = item['recommendedIntake'];
-                  final gender = item['gender'];
-                  final portionSize = double.tryParse(item['portionSize']?.toString() ?? '1') ?? 1;
-
-                  // Adjust nutritional values using portion size
-                  double calories = (foodDetails['energy_kcal'] ?? 0) * portionSize;
-                  double protein = (foodDetails['protein_g'] ?? 0) * portionSize;
-                  double carbs = (foodDetails['carbohydrates_g'] ?? 0) * portionSize;
-                  double fat = (foodDetails['total_fat_g'] ?? 0) * portionSize;
-                  double sodium = (foodDetails['sodium_mg'] ?? 0) * portionSize;
-
-
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                        side: BorderSide(
-                          color: Color(0xFFafb992),
-                          width: 2,
-                        ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xFFD3F1DF),
+                        borderRadius: BorderRadius.circular(24),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Color(0xFFD3F1DF),
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          child: ListTile(
-                              contentPadding: const EdgeInsets.all(16),
-                              leading: CircleAvatar(
-                                radius: 24,
-                                backgroundColor: Color(0xFFAAD3C4),
-                                child: Text(
-                                  '${index + 1}',
-                                  style: GoogleFonts.poppins(
-                                    color: Color(0xFF0E4A06),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              title: Text(
-                                foodDetails['food_name'] ?? "Unknown Dish",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 21,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF0E4A06),
-                                ),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "$portionSize portion(s)",
-                                    style: GoogleFonts.nunito(
-                                      fontSize: 15,
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text("Calories: ${calories.toStringAsFixed(2)} kcal", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
-                                  Text("Protein: ${protein.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
-                                  Text("Carbs: ${carbs.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
-                                  Text("Fat: ${fat.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
-                                  Text("Sodium: ${sodium.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
-                                  const SizedBox(height: 15),
-                                  Text(
-                                    "🕒 ${DateTime.tryParse(item['timestamp'] ?? '')?.toLocal().toString().split('.')[0] ?? 'Unknown time'}",
-                                    style: GoogleFonts.nunito(
-                                      fontSize: 14,
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.grey[700],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              trailing: Icon(
-                                Icons.arrow_forward_ios,
-                                size: 24,
+                      child: ListTile(
+                          contentPadding: const EdgeInsets.all(16),
+                          leading: CircleAvatar(
+                            radius: 24,
+                            backgroundColor: Color(0xFFAAD3C4),
+                            child: Text(
+                              '${index + 1}',
+                              style: GoogleFonts.poppins(
                                 color: Color(0xFF0E4A06),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => MacronutrientAdvicePage(
-                                      foodDetails: foodDetails,
-                                      assessment: assessment,
-                                      recommendedIntake: recommendedIntake,
-                                      gender: gender,
-                                      portionSize: item['portionSize'],
-                                      pinnedTips: (item['pinnedTips'] as String?)?.split('|'),
-                                      notice: item['notice'], // NEW
-                                    ),
-                                  ),
-                                );
-                              }
+                            ),
                           ),
-                        ),
+                          title: Text(
+                            foodDetails['food_name'] ?? "Unknown Dish",
+                            style: GoogleFonts.poppins(
+                              fontSize: 21,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF0E4A06),
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "$portionSize portion(s)",
+                                style: GoogleFonts.nunito(
+                                  fontSize: 15,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text("Calories: ${calories.toStringAsFixed(2)} kcal", style: GoogleFonts.nunito(fontSize:15)),
+                              Text("Protein: ${protein.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
+                              Text("Carbs: ${carbs.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
+                              Text("Fat: ${fat.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
+                              const SizedBox(height: 8),
+                              Text(
+                                "🕒 ${DateTime.tryParse(item['timestamp'] ?? '')?.toLocal().toString().split('.')[0] ?? 'Unknown time'}",
+                                style: GoogleFonts.nunito(
+                                  fontSize: 14,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                          trailing: Icon(
+                            Icons.arrow_forward_ios,
+                            size: 24,
+                            color: Color(0xFF0E4A06),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MacronutrientAdvicePage(
+                                  foodDetails: foodDetails,
+                                  assessment: assessment,
+                                  recommendedIntake: recommendedIntake,
+                                  gender: gender,
+                                  portionSize: item['portionSize'],
+                                  pinnedTips: (item['pinnedTips'] as String?)?.split('|'),
+                                  notice: item['notice'], // NEW
+                                ),
+                              ),
+                            );
+                          }
                       ),
                     ),
-                  );
-                },
+                  ),
+                ),
               );
             },
-          ),
-        ],
-      )
+          );
+        },
+      ),
     );
   }
 }

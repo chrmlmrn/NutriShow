@@ -51,13 +51,19 @@ class FoodHistoryPage extends StatelessWidget {
               final assessment = item['assessment'];
               final recommendedIntake = item['recommendedIntake'];
               final gender = item['gender'];
-              final portionSize = double.tryParse(item['portionSize']?.toString() ?? '1') ?? 1;
+              final portionSize = double.tryParse(item['portionSize']?.toString() ?? '') ?? 1.0;
 
-              // Adjust nutritional values using portion size
-              double calories = (foodDetails['energy_kcal'] ?? 0) * portionSize;
-              double protein = (foodDetails['protein_g'] ?? 0) * portionSize;
-              double carbs = (foodDetails['carbohydrates_g'] ?? 0) * portionSize;
-              double fat = (foodDetails['total_fat_g'] ?? 0) * portionSize;
+              double parseDouble(dynamic value) {
+                if (value == null) return 0;
+                return double.tryParse(value.toString()) ?? 0;
+              }
+
+              double calories = parseDouble(foodDetails['energy_kcal']) * portionSize;
+              double protein = parseDouble(foodDetails['protein_g']) * portionSize;
+              double carbs = parseDouble(foodDetails['carbohydrates_g']) * portionSize;
+              double fat = parseDouble(foodDetails['total_fat_g']) * portionSize;
+              double sodium = parseDouble(foodDetails['sodium_mg']) * portionSize;
+
 
               return Container(
                 margin: const EdgeInsets.symmetric(vertical: 8),
@@ -114,6 +120,8 @@ class FoodHistoryPage extends StatelessWidget {
                               Text("Protein: ${protein.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
                               Text("Carbs: ${carbs.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
                               Text("Fat: ${fat.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
+                              Text("Sodium: ${sodium.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
+
                               const SizedBox(height: 8),
                               Text(
                                 "🕒 ${DateTime.tryParse(item['timestamp'] ?? '')?.toLocal().toString().split('.')[0] ?? 'Unknown time'}",

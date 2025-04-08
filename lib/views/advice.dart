@@ -76,6 +76,13 @@ class MacronutrientAdvicePage extends StatelessWidget {
       "You’ve gone past the ideal fat intake—scale it down to improve balance.",
       "Fat intake exceeded the recommended amount—moderate it accordingly.",
     ];
+    final sodiumTooMuch = [
+      "Excess sodium detected—try to cut back on processed or salty items.",
+      "You’ve exceeded the recommended sodium levels—moderate your salt intake.",
+      "Sodium levels are above the healthy limit—watch your salt intake.",
+      "High sodium intake may lead to health risks—adjust your diet accordingly.",
+      "You're consuming more sodium than needed—aim to reduce it."
+    ];
 
     final proteinLack = [
       "Your protein intake is lower than recommended—try to include more in your diet.",
@@ -107,6 +114,9 @@ class MacronutrientAdvicePage extends StatelessWidget {
     }
     if (tooMuch.any((e) => e.toLowerCase().contains("fat"))) {
       pins.add("\uD83D\uDCCC ${fatsTooMuch[rand.nextInt(5)]}");
+    }
+    if (tooMuch.any((e) => e.toLowerCase().contains("sodium"))) {
+      pins.add("\uD83D\uDCCC ${sodiumTooMuch[rand.nextInt(5)]}");
     }
 
     if (lacking.any((e) => e.toLowerCase().contains("protein"))) {

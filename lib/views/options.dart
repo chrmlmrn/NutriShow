@@ -394,6 +394,16 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         ][Random().nextInt(5)]}");
       }
 
+      if (tooMuch.any((e) => e.toLowerCase().contains("sodium"))) {
+        pinnedTips.add("📌 ${[
+          "Excess sodium detected—try to cut back on processed or salty items.",
+          "You’ve exceeded the recommended sodium levels—moderate your salt intake.",
+          "Sodium levels are above the healthy limit—watch your salt intake.",
+          "High sodium intake may lead to health risks—adjust your diet accordingly.",
+          "You're consuming more sodium than needed—aim to reduce it."
+        ][Random().nextInt(5)]}");
+      }
+
       if (lacking.any((e) => e.toLowerCase().contains("protein"))) {
         pinnedTips.add("📌 ${[
           "Your protein intake is lower than recommended—try to include more in your diet.",

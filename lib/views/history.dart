@@ -103,14 +103,19 @@ class FoodHistoryPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Portion: $portionSize serving(s)",
+                                "$portionSize portion(s)",
                                 style: GoogleFonts.nunito(
                                   fontSize: 15,
                                   fontStyle: FontStyle.italic,
                                   color: Colors.black87,
                                 ),
                               ),
-                              const SizedBox(height: 11),
+                              const SizedBox(height: 8),
+                              Text("Calories: ${calories.toStringAsFixed(2)} kcal", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
+                              Text("Protein: ${protein.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
+                              Text("Carbs: ${carbs.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
+                              Text("Fat: ${fat.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
+                              const SizedBox(height: 15),
                               Text(
                                 "🕒 ${DateTime.tryParse(item['timestamp'] ?? '')?.toLocal().toString().split('.')[0] ?? 'Unknown time'}",
                                 style: GoogleFonts.nunito(
@@ -119,11 +124,6 @@ class FoodHistoryPage extends StatelessWidget {
                                   color: Colors.grey[700],
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Text("Calories: ${calories.toStringAsFixed(2)} kcal", style: GoogleFonts.nunito(fontSize:15)),
-                              Text("Protein: ${protein.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
-                              Text("Carbs: ${carbs.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
-                              Text("Fat: ${fat.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15)),
                             ],
                           ),
                           trailing: Icon(

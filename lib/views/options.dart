@@ -103,7 +103,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
 
       // Fetch the portion type after the food detection
       String portionType = await _getPortionTypeFromDatabase(foodName);
-      print("Portion type: $portionType");
+      print("Portion Size: $portionType");
 
     } catch (e) {
       print("Error during inference: $e");
@@ -195,7 +195,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Portion Type: 1 $portionType"),
+              Text("Portion Size: 1 $portionType"),
               if (servingSize > 0)
                 Text("Amount: $servingSize g"),
               const SizedBox(height: 9),
@@ -474,7 +474,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         title: Center(
           child: Text(
             'Dish Classification',
-            style: GoogleFonts.nunito(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
+            style: GoogleFonts.nunito(fontSize: 27, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
           ),
         ),
         actions: [

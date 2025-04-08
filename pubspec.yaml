@@ -84,6 +84,7 @@ flutter:
     - assets/thumb_MobileNetV2_v5.tflite
     - assets/logo.png
     - assets/background.png
+    - assets/screensbg.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

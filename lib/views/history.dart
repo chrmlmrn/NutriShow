@@ -67,6 +67,7 @@ class FoodHistoryPage extends StatelessWidget {
                   double protein = (foodDetails['protein_g'] ?? 0) * portionSize;
                   double carbs = (foodDetails['carbohydrates_g'] ?? 0) * portionSize;
                   double fat = (foodDetails['total_fat_g'] ?? 0) * portionSize;
+                  double sodium = (foodDetails['sodium_mg'] ?? 0) * portionSize;
 
 
                   return Container(
@@ -124,6 +125,7 @@ class FoodHistoryPage extends StatelessWidget {
                                   Text("Protein: ${protein.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
                                   Text("Carbs: ${carbs.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
                                   Text("Fat: ${fat.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
+                                  Text("Sodium: ${sodium.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize:15,color: Colors.black87)),
                                   const SizedBox(height: 15),
                                   Text(
                                     "🕒 ${DateTime.tryParse(item['timestamp'] ?? '')?.toLocal().toString().split('.')[0] ?? 'Unknown time'}",

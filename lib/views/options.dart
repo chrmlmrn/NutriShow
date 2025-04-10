@@ -528,10 +528,18 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
             tip: selectedTip,
             notice: selectedNotice,
             pinnedTips: pinnedTips,
-            activityLevel: widget.activityLevel
+            activityLevel: widget.activityLevel,
           ),
         ),
-      );
+      ).then((_) {
+        // 🔁 This runs when you go back from MacronutrientAdvicePage
+        setState(() {
+          _image = null;
+          _foodResult = null;
+          _portionSize = null;
+          _foodId = null;
+        });
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("No nutritional data found for '$foodName'")),

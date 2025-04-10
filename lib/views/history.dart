@@ -119,7 +119,7 @@ class FoodHistoryPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "${formatValue(portionSize, item['portionSize']?.toString())} portion(s)",
+                                    "🥣 ${formatValue(portionSize, item['portionSize']?.toString())} portion(s)",
                                     style: GoogleFonts.nunito(
                                       fontSize: 15,
                                       fontStyle: FontStyle.italic,

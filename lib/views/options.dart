@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -80,11 +81,69 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
   Future<void> _runDetection() async {
     if (_image == null) return;
 
+    // Show aesthetic loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Stack(
+          children: [
+            // Blur + dim background
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                color: Colors.black.withOpacity(0.2),
+              ),
+            ),
+            // Centered loader card
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(25),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 15,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
+                width: 250,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(
+                      color: Color(0xFF5D8736),
+                      strokeWidth: 4,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      "Analyzing your dish...",
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF0E4A06),
+                        decoration: TextDecoration.none,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
     try {
-      final input = await _preprocessImage(File(_image!.path));
-      if (input == null) {
-        throw Exception("Failed to preprocess image.");
-      }
+      final startDetection = _preprocessImage(File(_image!.path));
+      final enforcedDelay = Future.delayed(Duration(seconds: 2)); // 2-second delay
+
+      final input = await startDetection;
+      if (input == null) throw Exception("Failed to preprocess image.");
 
       final foodOutput = List.filled(80, 0.0).reshape([1, 80]);
       _foodInterpreter.run(input, foodOutput);
@@ -97,12 +156,18 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         ..sort((a, b) => (b['confidence'] as double).compareTo(a['confidence'] as double));
 
       String foodName = predictions[0]["label"];
+
+      // Wait for both detection and 2 seconds
+      await Future.wait([
+        Future.value(), // optional placeholder
+        enforcedDelay
+      ]);
+
       setState(() {
         _foodResult = '$foodName (${(predictions[0]["confidence"] * 100).toStringAsFixed(2)}%)';
-        _foodId = foodName; // Store the food name or map it to the food ID
+        _foodId = foodName;
       });
 
-      // Fetch the portion type after the food detection
       String portionType = await _getPortionTypeFromDatabase(foodName);
       print("Portion Size: $portionType");
 
@@ -111,8 +176,13 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       setState(() {
         _foodResult = "Error during inference.";
       });
+    } finally {
+      Navigator.pop(context); // close loading dialog
     }
+
   }
+
+
 
   Future<void> _takePhoto() async {
     final photo = await _picker.pickImage(source: ImageSource.camera);

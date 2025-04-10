@@ -599,42 +599,93 @@ class MacronutrientAdvicePage extends StatelessWidget {
 
     final g = isMale ? 'm' : 'f';
 
-    final nutrientsToShow = {
-      "energy_${g}_$actCode": ["Energy", "kcal"],
-      "protein_$g": ["Protein", "g"],
-      "carbohydrates_${g}_${actCode}_min": ["Carbohydrates", "g"],
-      "fiber_min": ["Fiber", "g"],
-      "total_sugars_${g}_$actCode": ["Total Sugars", "g"],
-      "total_fat_${g}_${actCode}_max": ["Total Fat", "g"],
-      "sodium": ["Sodium", "mg"],
-      "iron_$g": ["Iron", "mg"],
-      "zinc_$g": ["Zinc", "mg"],
-      "vitamin_c_$g": ["Vitamin C", "mg"],
-      "vitamin_b6_$g": ["Vitamin B6", "mg"],
-      "folate_$g": ["Folate", "μg"],
-      "vitamin_a_$g": ["Vitamin A", "μg"],
-      "vitamin_e_$g": ["Vitamin E", "mg"],
-      "vitamin_k_$g": ["Vitamin K", "μg"],
-      "calcium_$g": ["Calcium", "mg"],
-      "potassium": ["Potassium", "mg"],
-    };
+    final nutrientsToShow = [
+      ["energy", "Energy", "kcal"],
+      ["protein", "Protein", "g"],
+      ["carbohydrates", "Carbohydrates", "g"],
+      ["fiber", "Fiber", "g"],
+      ["total_sugars", "Total Sugars", "g"],
+      ["total_fat", "Total Fat", "g"],
+      ["sodium", "Sodium", "mg"],
+      ["iron", "Iron", "mg"],
+      ["zinc", "Zinc", "mg"],
+      ["vitamin_c", "Vitamin C", "mg"],
+      ["vitamin_b6", "Vitamin B6", "mg"],
+      ["folate", "Folate", "μg"],
+      ["vitamin_a", "Vitamin A", "μg"],
+      ["vitamin_e", "Vitamin E", "mg"],
+      ["vitamin_k", "Vitamin K", "μg"],
+      ["calcium", "Calcium", "mg"],
+      ["potassium", "Potassium", "mg"],
+    ];
 
-    return nutrientsToShow.entries.map((entry) {
-      final value = intake[entry.key];
-      final nutrient = entry.value[0];
-      final unit = entry.value[1];
-      final formattedValue = value is num ? _formatValue(value) : value.toString();
+    List<Widget> output = [];
 
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2.0),
-        child: Text(
-          "🟢  $nutrient: $formattedValue $unit",
-          style: GoogleFonts.nunito(fontSize: 16.5),
+    for (final nutrient in nutrientsToShow) {
+      final base = nutrient[0];
+      final label = nutrient[1];
+      final unit = nutrient[2];
+
+      final minKeyCandidates = [
+        "${base}_${g}_${actCode}_min",
+        "${base}_${g}_s_min",
+        "${base}_${g}_ma_min",
+        "${base}_${g}_a_min",
+        "${base}_${g}_min",
+        "${base}_min",
+      ];
+
+      final maxKeyCandidates = [
+        "${base}_${g}_${actCode}_max",
+        "${base}_${g}_s_max",
+        "${base}_${g}_ma_max",
+        "${base}_${g}_a_max",
+        "${base}_${g}_max",
+        "${base}_max",
+      ];
+
+      final altKeyCandidates = [
+        "${base}_${g}_${actCode}",
+        "${base}_${g}_s",
+        "${base}_${g}_ma",
+        "${base}_${g}_a",
+        "${base}_${g}",
+        base,
+      ];
+
+      final minKey = minKeyCandidates.firstWhere((k) => intake.containsKey(k), orElse: () => '');
+      final maxKey = maxKeyCandidates.firstWhere((k) => intake.containsKey(k), orElse: () => '');
+      final altKey = altKeyCandidates.firstWhere((k) => intake.containsKey(k), orElse: () => '');
+
+      final minVal = minKey.isNotEmpty ? intake[minKey] : null;
+      final maxVal = maxKey.isNotEmpty ? intake[maxKey] : null;
+
+      String displayText;
+      if (minVal != null && maxVal != null) {
+        displayText = "${_formatValue(minVal)}–${_formatValue(maxVal)} $unit";
+      } else if (minVal != null) {
+        displayText = "≥ ${_formatValue(minVal)} $unit";
+      } else if (maxVal != null) {
+        displayText = "≤ ${_formatValue(maxVal)} $unit";
+      } else if (altKey.isNotEmpty && intake[altKey] != null) {
+        displayText = "${_formatValue(intake[altKey])} $unit";
+      } else {
+        continue;
+      }
+
+      output.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2.0),
+          child: Text(
+            "🟢  $label: $displayText",
+            style: GoogleFonts.nunito(fontSize: 16.5),
+          ),
         ),
       );
-    }).toList();
-  }
+    }
 
+    return output;
+  }
 
 
 

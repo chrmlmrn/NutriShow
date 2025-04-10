@@ -339,32 +339,31 @@ class MacronutrientAdvicePage extends StatelessWidget {
                       style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.w700),
                     ),
                     if ((assessment?['too_much'] as List?)?.isEmpty ?? true)
-                      Text("• None", style: GoogleFonts.nunito(fontSize: 16.5))
+                      Text("⚫  None", style: GoogleFonts.nunito(fontSize: 16.5))
                     else
                       ...List.generate(
                         (assessment!['too_much'] as List).length,
                             (index) {
                           String item = assessment!['too_much'][index];
 
-                          if (item.contains("Vitamin B6")) {
-                            final matches = RegExp(r"(-?\d+(\.\d+)?)").allMatches(item).toList();
+                          final matches = RegExp(r"(-?\d+(\.\d+)?)").allMatches(item).toList();
 
-                            if (matches.length >= 2) {
-                              double secondNumber = double.parse(matches[1].group(0)!);
-                              item = item.replaceFirst(matches[1].group(0)!, secondNumber.toStringAsFixed(2));
-                            }
-                          } else {
-                            final match = RegExp(r"(-?\d+(\.\d+)?)").firstMatch(item);
+                          // If there are any numbers found in the string
+                          if (matches.isNotEmpty) {
+                            for (final match in matches) {
+                              final original = match.group(0)!;
+                              final parsed = double.tryParse(original);
 
-                            if (match != null) {
-                              double number = double.parse(match.group(0)!);
-                              item = item.replaceFirst(match.group(0)!, number.toStringAsFixed(2));
+                              if (parsed != null) {
+                                final formatted = _formatValue(parsed);
+                                item = item.replaceFirst(original, formatted);
+                              }
                             }
                           }
 
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 2.0),
-                            child: Text("• $item", style: GoogleFonts.nunito(fontSize: 16.5)),
+                            child: Text("🔴  $item", style: GoogleFonts.nunito(fontSize: 16.5)),
                           );
                         },
                       ),
@@ -376,35 +375,35 @@ class MacronutrientAdvicePage extends StatelessWidget {
                       style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.w700),
                     ),
                     if ((assessment?['lacking'] as List?)?.isEmpty ?? true)
-                      Text("• None", style: GoogleFonts.nunito(fontSize: 16.5))
+                      Text("⚫  None", style: GoogleFonts.nunito(fontSize: 16.5))
                     else
                       ...List.generate(
                         (assessment!['lacking'] as List).length,
                             (index) {
                           String item = assessment!['lacking'][index];
 
-                          if (item.contains("Vitamin B6")) {
-                            final matches = RegExp(r"(-?\d+(\.\d+)?)").allMatches(item).toList();
+                          final matches = RegExp(r"(-?\d+(\.\d+)?)").allMatches(item).toList();
 
-                            if (matches.length >= 2) {
-                              double secondNumber = double.parse(matches[1].group(0)!);
-                              item = item.replaceFirst(matches[1].group(0)!, secondNumber.toStringAsFixed(2));
-                            }
-                          } else {
-                            final match = RegExp(r"(-?\d+(\.\d+)?)").firstMatch(item);
+                          // If there are any numbers found in the string
+                          if (matches.isNotEmpty) {
+                            for (final match in matches) {
+                              final original = match.group(0)!;
+                              final parsed = double.tryParse(original);
 
-                            if (match != null) {
-                              double number = double.parse(match.group(0)!);
-                              item = item.replaceFirst(match.group(0)!, number.toStringAsFixed(2));
+                              if (parsed != null) {
+                                final formatted = _formatValue(parsed);
+                                item = item.replaceFirst(original, formatted);
+                              }
                             }
                           }
 
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 2.0),
-                            child: Text("• $item", style: GoogleFonts.nunito(fontSize: 16.5)),
+                            child: Text("🟡  $item", style: GoogleFonts.nunito(fontSize: 16.5)),
                           );
                         },
                       ),
+
                     if (recommendedIntake != null)
                       ...[
                         const SizedBox(height: 15),
@@ -588,24 +587,6 @@ class MacronutrientAdvicePage extends StatelessWidget {
     );
   }
 
-  Widget _buildTip(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        children: [
-          Icon(Icons.check_circle, color: Colors.green, size: 20),
-          SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              text,
-              style: GoogleFonts.nunito(fontSize: 16),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   List<Widget> _buildRecommendedIntakeList(Map<String, dynamic> intake, String activityLevel) {
     final isMale = gender?.toLowerCase().startsWith('m') ?? true;
 
@@ -642,12 +623,12 @@ class MacronutrientAdvicePage extends StatelessWidget {
       final value = intake[entry.key];
       final nutrient = entry.value[0];
       final unit = entry.value[1];
-      final formattedValue = (value is num) ? value.toStringAsFixed(2) : '—';
+      final formattedValue = value is num ? _formatValue(value) : value.toString();
 
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 2.0),
         child: Text(
-          "• $nutrient: $formattedValue $unit",
+          "🟢  $nutrient: $formattedValue $unit",
           style: GoogleFonts.nunito(fontSize: 16.5),
         ),
       );

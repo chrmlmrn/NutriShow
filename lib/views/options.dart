@@ -458,7 +458,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
             tip: selectedTip,
             notice: selectedNotice,
             pinnedTips: pinnedTips,
-            activityLevel: widget.activityLevel,
+            activityLevel: widget.activityLevel
           ),
         ),
       );

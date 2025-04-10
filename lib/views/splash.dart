@@ -13,7 +13,7 @@ class SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 10), () {
+    Future.delayed(const Duration(seconds: 6), () {
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -45,7 +45,7 @@ class SplashScreenState extends State<SplashScreen> {
                   width: 150,
                   height: 150,
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
                 Text(
                   'NutriShow',
                   style: GoogleFonts.changaOne(
@@ -54,6 +54,7 @@ class SplashScreenState extends State<SplashScreen> {
                     color: Color(0xFFF4FFC3),
                   ),
                 ),
+                const SizedBox(height: 6),
                 Text(
                   'Image In, Insights Out: \nTrack your food without a doubt',
                   style: GoogleFonts.nunito(

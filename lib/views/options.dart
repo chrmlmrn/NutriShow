@@ -464,7 +464,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           "Fat intake exceeded the recommended amount—moderate it accordingly."
         ][Random().nextInt(5)]}");
       }
-
       if (tooMuch.any((e) => e.toLowerCase().contains("sodium"))) {
         pinnedTips.add("📌 ${[
           "Excess sodium detected—try to cut back on processed or salty items.",
@@ -474,7 +473,15 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           "You're consuming more sodium than needed—aim to reduce it."
         ][Random().nextInt(5)]}");
       }
-
+      if (tooMuch.any((e) => e.toLowerCase().contains("fiber"))) {
+        pinnedTips.add("📌 ${[
+            "Looks like your fiber intake is higher than needed—consider scaling it back.",
+            "You’re getting more fiber than your body might need—try to balance it out.",
+            "You may be consuming excessive fiber—reduce slightly for smoother digestion.",
+            "Overconsumption of fiber detected—try adjusting your portions.",
+            "Fiber is essential, but your intake exceeds recommendations—ease it up a bit."
+        ][Random().nextInt(5)]}");
+      }
       if (lacking.any((e) => e.toLowerCase().contains("protein"))) {
         pinnedTips.add("📌 ${[
           "Your protein intake is lower than recommended—try to include more in your diet.",
@@ -500,6 +507,15 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           "Fats are crucial and currently insufficient—add more nutritious fats.",
           "You're not meeting the daily fat requirement—eat more balanced fat sources.",
           "Try increasing your intake of healthy fats to improve overall nutrition."
+        ][Random().nextInt(5)]}");
+      }
+      if (lacking.any((e) => e.toLowerCase().contains("fiber"))) {
+        pinnedTips.add("📌 ${[
+            "You may be missing out on enough fiber—consider adding more fiber-rich foods to your meals.",
+            "Fiber intake is currently insufficient—boosting it may support better digestion.",
+            "A bit more fiber in your diet could go a long way—start with small changes.",
+            "Low fiber intake noticed—try to mix in high-fiber foods with your usual dishes.",
+            "You're not quite hitting the fiber target—adjust your meals for better nutritional balance."
         ][Random().nextInt(5)]}");
       }
 

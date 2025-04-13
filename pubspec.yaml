@@ -81,7 +81,6 @@ flutter:
     - assets/mobilenetv2_food_classifier.tflite
     - assets/labels.txt
     - assets/nutrishow_data.db
-    - assets/thumb_MobileNetV2_v5.tflite
     - assets/logo.png
     - assets/background.png
     - assets/screensbg.png

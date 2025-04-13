@@ -82,6 +82,7 @@ flutter:
     - assets/mobilenetv2_food_classifier.tflite
     - assets/labels.txt
     - assets/nutrishow_data.db
+    - assets/thumb_MobileNetV2_v5.tflite
     - assets/logo.png
     - assets/background.png
     - assets/screensbg.png
@@ -97,30 +98,47 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  #fonts:
-  #  - family: Poppins
-  #    fonts:
-  #      - asset: fonts/Poppins-ExtraLightItalic.ttf
-  #      - asset: fonts/Poppins-Italic.ttf
-  #      - asset: fonts/Poppins-Light.ttf
-  #      - asset: fonts/Poppins-LightItalic.ttf
-  #      - asset: fonts/Poppins-Medium.ttf
-  #      - asset: fonts/Poppins-MediumItalic.ttf
-  #      - asset: fonts/Poppins-Regular.ttf
-  #      - asset: fonts/Poppins-SemiBold.ttf
-  #      - asset: fonts/Poppins-SemiBoldItalic.ttf
-  #      - asset: fonts/Poppins-Thin.ttf
-  #      - asset: fonts/Poppins-ThinItalic.ttf
-  #  - family: Nunito
-  #    fonts:
-  #      - asset: fonts/Nunito-Italic-VariableFont_wght.ttf
-  #        weight: 600
-  #      - asset: fonts/Nunito-VariableFont_wght.ttf
-  #        weight: 900
-  #  - family: Changa One
-  #    fonts:
-  #      - asset: fonts/ChangaOne-Regular.ttf
-  #      - asset: fonts/ChangaOne-Italic.ttf
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins-Thin.ttf
+          weight: 100
+        - asset: fonts/Poppins-ThinItalic.ttf
+          weight: 100
+          style: italic
+        - asset: fonts/Poppins-ExtraLightItalic.ttf
+          weight: 200
+          style: italic
+        - asset: fonts/Poppins-Light.ttf
+          weight: 300
+        - asset: fonts/Poppins-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: fonts/Poppins-Regular.ttf
+          weight: 400
+        - asset: fonts/Poppins-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: fonts/Poppins-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: fonts/Poppins-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+    - family: Nunito
+      fonts:
+        - asset: fonts/Nunito-Italic-VariableFont_wght.ttf
+          style: italic
+        - asset: fonts/Nunito-VariableFont_wght.ttf
+    - family: Changa One
+      fonts:
+        - asset: fonts/ChangaOne-Regular.ttf
+        - asset: fonts/ChangaOne-Italic.ttf
+          style: italic
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

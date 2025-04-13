@@ -43,6 +43,7 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_launcher_icons: ^0.14.3
   fl_chart: ^0.70.2
+  pie_chart: ^5.4.0
 
 
 dev_dependencies:

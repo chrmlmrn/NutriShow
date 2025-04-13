@@ -53,7 +53,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
   }
 
   String? _getRecommendedKey(
-      String nutrient, String gender, String activity, Map<String, dynamic> row) {
+    String nutrient, String gender, String activity, Map<String, dynamic> row) {
     final g = gender.toLowerCase().startsWith("m") ? "m" : "f";
     final a = activity.toLowerCase().contains("sedentary")
         ? "s"
@@ -116,6 +116,13 @@ class MacronutrientAdvicePage extends StatelessWidget {
       "High sodium intake may lead to health risks—adjust your diet accordingly.",
       "You're consuming more sodium than needed—aim to reduce it."
     ];
+    final fiberTooMuch = [
+      "You’ve surpassed the healthy fat limit—adjust your consumption.",
+      "You're going over the fat recommendation—reduce for a healthier balance.",
+      "Fat intake should be moderated—consider choosing low-fat alternatives.",
+      "You’ve gone past the ideal fat intake—scale it down to improve balance.",
+      "Fat intake exceeded the recommended amount—moderate it accordingly."
+    ];
 
     final proteinLack = [
       "Your protein intake is lower than recommended—try to include more in your diet.",
@@ -138,6 +145,13 @@ class MacronutrientAdvicePage extends StatelessWidget {
       "You're not meeting the daily fat requirement—eat more balanced fat sources.",
       "Try increasing your intake of healthy fats to improve overall nutrition.",
     ];
+    final fiberLack = [
+      "You may be missing out on enough fiber—consider adding more fiber-rich foods to your meals.",
+      "Fiber intake is currently insufficient—boosting it may support better digestion.",
+      "A bit more fiber in your diet could go a long way—start with small changes.",
+      "Low fiber intake noticed—try to mix in high-fiber foods with your usual dishes.",
+      "You're not quite hitting the fiber target—adjust your meals for better nutritional balance."
+    ];
 
     if (tooMuch.any((e) => e.toLowerCase().contains("protein"))) {
       pins.add("\uD83D\uDCCC ${proteinTooMuch[rand.nextInt(5)]}");
@@ -151,6 +165,9 @@ class MacronutrientAdvicePage extends StatelessWidget {
     if (tooMuch.any((e) => e.toLowerCase().contains("sodium"))) {
       pins.add("\uD83D\uDCCC ${sodiumTooMuch[rand.nextInt(5)]}");
     }
+    if (tooMuch.any((e) => e.toLowerCase().contains("fiber"))) {
+      pins.add("\uD83D\uDCCC ${fiberTooMuch[rand.nextInt(5)]}");
+    }
 
     if (lacking.any((e) => e.toLowerCase().contains("protein"))) {
       pins.add("\uD83D\uDCCC ${proteinLack[rand.nextInt(5)]}");
@@ -160,6 +177,9 @@ class MacronutrientAdvicePage extends StatelessWidget {
     }
     if (lacking.any((e) => e.toLowerCase().contains("fat"))) {
       pins.add("\uD83D\uDCCC ${fatsLack[rand.nextInt(5)]}");
+    }
+    if (lacking.any((e) => e.toLowerCase().contains("fiber"))) {
+      pins.add("\uD83D\uDCCC ${fiberLack[rand.nextInt(5)]}");
     }
 
 

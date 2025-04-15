@@ -199,6 +199,7 @@ class DatabaseHelper {
       throw Exception("Portion not found for food ID: \$foodId");
     }
   }
+
 }
 
 extension StringExtension on String {

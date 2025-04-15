@@ -259,7 +259,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Color(0xFFF9FEED),
-                    labelText: 'Gender',
+                    labelText: 'Sex',
                     labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),

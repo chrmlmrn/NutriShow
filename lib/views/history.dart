@@ -70,12 +70,6 @@ class FoodHistoryPage extends StatelessWidget {
 
               final nutrientSections = [
                 PieChartSectionData(
-                  value: totalCalories,
-                  title: '',
-                  color: const Color(0xFFABCB4D),
-                  radius: 90,
-                ),
-                PieChartSectionData(
                   value: totalProtein,
                   title: '',
                   color: const Color(0xFF5D8736),
@@ -102,12 +96,55 @@ class FoodHistoryPage extends StatelessWidget {
                   Text(
                     "Total Nutrients Breakdown",
                     style: GoogleFonts.nunito(
-                      fontSize: 22,
+                      fontSize: 24,
                       fontWeight: FontWeight.w800,
                       color: Color(0xFF0E4A06),
                     ),
                     textAlign: TextAlign.center,
                   ),
+                  const SizedBox(height: 15),
+                  Center(
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF4FFC3),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: Color(0xFFABCB4D), width: 1.8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.local_fire_department, color: Color(0xFFABCB4D), size: 26),
+                          const SizedBox(width: 10),
+                          Text(
+                            "Calories: ",
+                            style: GoogleFonts.nunito(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF0E4A06),
+                            ),
+                          ),
+                          Text(
+                            "${totalCalories.toStringAsFixed(2)} kcal",
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF914F1E),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
                   SizedBox(
                     height: 250,
                     child: PieChart(
@@ -123,14 +160,6 @@ class FoodHistoryPage extends StatelessWidget {
                     spacing: 16,
                     runSpacing: 8,
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(width: 14, height: 14, decoration: BoxDecoration(color: Color(0xFFABCB4D), shape: BoxShape.circle)),
-                          const SizedBox(width: 6),
-                          Text("Calories: ${totalCalories.toStringAsFixed(2)} kcal", style: GoogleFonts.nunito(fontSize: 15)),
-                        ],
-                      ),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [

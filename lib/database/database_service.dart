@@ -43,9 +43,10 @@ class DatabaseHelper {
     // Query to join food_items and food_servings to get details for the provided food name
     List<Map<String, dynamic>> results = await db.rawQuery(
       '''
-      SELECT fi.food_name, fs.*
+      SELECT fi.food_name, fc.category_name, fs.*
       FROM food_items fi
       JOIN food_servings fs ON fi.food_uid = fs.food_uid
+      JOIN food_category fc ON fi.category_uid = fc.category_uid
       WHERE LOWER(fi.food_name) = ?
       ''',
       [foodName.trim().toLowerCase()],

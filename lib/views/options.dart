@@ -34,6 +34,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
   String? _foodResult;
   String? _portionSize;
   String? _foodId;
+  String? _category;
   late Interpreter _foodInterpreter;
   late List<String> _labels;
 
@@ -145,7 +146,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       final input = await startDetection;
       if (input == null) throw Exception("Failed to preprocess image.");
 
-      final foodOutput = List.filled(80, 0.0).reshape([1, 80]);
+      final foodOutput = List.filled(30, 0.0).reshape([1, 30]);
       _foodInterpreter.run(input, foodOutput);
 
       final predictions = foodOutput[0]
@@ -164,9 +165,18 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       ]);
 
       setState(() {
-        _foodResult = '$foodName (${(predictions[0]["confidence"] * 100).toStringAsFixed(2)}%)';
+        _foodResult = foodName;
         _foodId = foodName;
       });
+
+      DatabaseHelper dbHelper = DatabaseHelper();
+      Map<String, dynamic>? foodDetails = await dbHelper.getFoodDetails(foodName);
+
+      if (foodDetails != null && foodDetails.containsKey('category_name')) {
+        setState(() {
+          _category = foodDetails['category_name'];
+        });
+      }
 
       String portionType = await _getPortionTypeFromDatabase(foodName);
       print("Portion Size: $portionType");
@@ -320,9 +330,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         [foodName.trim().toLowerCase()],
       );
 
-      // Debug: Log the foodId
-      print("Food UID for $foodName: $foodIdResult");
-
       if (foodIdResult.isNotEmpty) {
         String foodUid = foodIdResult.first['food_uid'] as String;
 
@@ -346,7 +353,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         throw Exception("Food UID not found for food name: $foodName");
       }
     } catch (e) {
-      print("Error fetching portion type: $e");
       return 'Unknown';  // Fallback if an error occurs
     }
   }
@@ -355,7 +361,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     if (_foodResult == null) return;
 
     String foodName = _foodResult!.split(" (")[0].trim();
-    print("Predicted Food Name: $foodName");
 
     DatabaseHelper dbHelper = DatabaseHelper();
     Map<String, dynamic>? foodDetails = await dbHelper.getFoodDetails(foodName);
@@ -554,6 +559,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           _foodResult = null;
           _portionSize = null;
           _foodId = null;
+          _category = foodDetails['category_name'];
         });
       });
     } else {
@@ -652,7 +658,12 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                       "Portion: $_portionSize",
                       style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black54),
                     ),
-                  const SizedBox(height: 35),
+                  if (_category != null)
+                    Text(
+                      "Category: ${_category!}",
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87),
+                    ),
+                  const SizedBox(height: 20),
                   Column(
                     mainAxisSize: MainAxisSize.min, // Ensure all buttons stack up and are centered
                     children: [

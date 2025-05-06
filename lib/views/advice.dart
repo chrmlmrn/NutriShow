@@ -197,17 +197,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
   }
 
   String _formatValue(num value) {
-    if (portionSize != null) {
-      if (portionSize!.contains('.') || portionSize!.contains('/')) {
-        return value.toStringAsFixed(2);
-      } else {
-        final portionNumber = double.tryParse(portionSize!);
-        if (portionNumber != null && portionNumber % 1 != 0) {
-          return value.toStringAsFixed(2);
-        }
-      }
-    }
-    return value.toStringAsFixed(0); // Whole number if portion is whole
+    return value.toStringAsFixed(2);
   }
 
 
@@ -270,6 +260,18 @@ class MacronutrientAdvicePage extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
+              if (foodDetails['category_name'] != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    "Category: ${foodDetails['category_name'].toString()}",
+                    style: GoogleFonts.nunito(
+                      fontSize: 16.5,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
               Text(
                 foodDetails['food_name']?.toString().toUpperCase() ?? "UNKNOWN FOOD",
                 style: GoogleFonts.poppins(

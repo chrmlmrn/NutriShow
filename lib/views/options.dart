@@ -16,12 +16,14 @@ class DishOptionsScreen extends StatefulWidget {
   final int age;
   final String gender;
   final String activityLevel;
+  final String bmiCategory;
 
   const DishOptionsScreen({
     super.key,
     required this.age,
     required this.gender,
     required this.activityLevel,
+    required this.bmiCategory,
   });
 
   @override
@@ -37,6 +39,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
   String? _category;
   late Interpreter _foodInterpreter;
   late List<String> _labels;
+
 
   @override
   void initState() {
@@ -156,6 +159,47 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           .toList()
         ..sort((a, b) => (b['confidence'] as double).compareTo(a['confidence'] as double));
 
+      // Get top N categories from predictions
+      final dbHelper = DatabaseHelper();
+      final Set<String> categorySet = {};
+
+      for (int i = 0; i < min(5, predictions.length); i++) {
+        final label = predictions[i]['label'];
+        final details = await dbHelper.getFoodDetails(label);
+        if (details != null && details.containsKey('category_name')) {
+          categorySet.add(details['category_name']);
+        }
+      }
+
+      // Show dialog with top categories
+      // await showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) {
+      //     return AlertDialog(
+      //       backgroundColor: Color(0xFFF0FBEF),
+      //       title: Text(
+      //         "Detected Categories",
+      //         style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0E4A06)),
+      //       ),
+      //       content: Column(
+      //         mainAxisSize: MainAxisSize.min,
+      //         crossAxisAlignment: CrossAxisAlignment.start,
+      //         children: categorySet.map((category) => Text(
+      //           "• $category",
+      //           style: GoogleFonts.poppins(fontSize: 16, color: Colors.black87),
+      //         )).toList(),
+      //       ),
+      //       actions: [
+      //         TextButton(
+      //           child: Text("OK", style: GoogleFonts.poppins(color: Color(0xFF0E4A06))),
+      //           onPressed: () => Navigator.pop(context),
+      //         ),
+      //       ],
+      //     );
+      //   },
+      // );
+
+
       String foodName = predictions[0]["label"];
 
       // Wait for both detection and 2 seconds
@@ -169,7 +213,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         _foodId = foodName;
       });
 
-      DatabaseHelper dbHelper = DatabaseHelper();
       Map<String, dynamic>? foodDetails = await dbHelper.getFoodDetails(foodName);
 
       if (foodDetails != null && foodDetails.containsKey('category_name')) {
@@ -191,8 +234,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     }
 
   }
-
-
 
   Future<void> _takePhoto() async {
     final photo = await _picker.pickImage(source: ImageSource.camera);
@@ -358,6 +399,52 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
   }
 
   Future<void> _getAdvice() async {
+
+    if (widget.bmiCategory != "Healthy Weight") {
+      // No assessment, just show nutrition content
+      DatabaseHelper dbHelper = DatabaseHelper();
+      Map<String, dynamic>? foodDetails = await dbHelper.getFoodDetails(_foodResult!);
+
+      if (foodDetails != null) {
+        await FoodHistory.addToHistory(
+          foodDetails: {
+            ...foodDetails,
+            'activity_level': widget.activityLevel,
+          },
+          assessment: null, // ❌ No assessment
+          recommendedIntake: null, // ❌ No intake
+          gender: widget.gender,
+          portionSize: _portionSize,
+          notice: null,
+          pinnedTips: '',
+        );
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MacronutrientAdvicePage(
+              foodDetails: foodDetails,
+              assessment: null,
+              recommendedIntake: null,
+              gender: widget.gender,
+              portionSize: _portionSize,
+              tip: null,
+              notice: null,
+              pinnedTips: null,
+              activityLevel: widget.activityLevel,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("No nutritional data found for this food.")),
+        );
+      }
+
+      return; // ✅ Exit early — no dietary logic
+    }
+
+
     if (_foodResult == null) return;
 
     String foodName = _foodResult!.split(" (")[0].trim();
@@ -553,7 +640,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           ),
         ),
       ).then((_) {
-        // 🔁 This runs when you go back from MacronutrientAdvicePage
         setState(() {
           _image = null;
           _foodResult = null;

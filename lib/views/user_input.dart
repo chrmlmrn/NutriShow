@@ -128,35 +128,37 @@ class _UserInputScreenState extends State<UserInputScreen> {
         category = "Obese";
       }
 
-      if (category == "Healthy Weight") {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: Color(0xFFCFE3DA),
-            title: Text("BMI Status", style: GoogleFonts.poppins(fontSize: 25, color: Color(0xFF0E4A06), fontWeight:FontWeight.w700)),
-            content: Text("You're doing well! A BMI of ${bmi.toStringAsFixed(2)} puts you in the \"Healthy Weight\" category. Keep it up!"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => DishOptionsScreen(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFFCFE3DA),
+          title: Text("BMI Status", style: GoogleFonts.poppins(fontSize: 25, color: Color(0xFF0E4A06), fontWeight: FontWeight.w700)),
+          content: Text(
+            category == "Healthy Weight"
+                ? "You're doing well! A BMI of ${bmi.toStringAsFixed(2)} puts you in the \"Healthy Weight\" category. Keep it up!"
+                : "Your BMI is ${bmi.toStringAsFixed(2)}. You are in the \"$category\" range. We advice that you seek the expertise of a Registered Nutritionist-Dietitian to get a personalized patient-centered nutrition consultation and dietary plan. \n\nNote: You may still use the app and view nutritional content, but dietary assessment will be disabled.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DishOptionsScreen(
                       age: int.parse(_ageController.text),
                       gender: _selectedGender!,
                       activityLevel: _selectedActivityLevel!,
+                      bmiCategory: category,
                     ),
                   ),
-                  );
-                },
-                child: Text("Continue", style: GoogleFonts.poppins(fontSize: 15, color: Color(0xFF0E4A06), fontWeight:FontWeight.w700)),
-              ),
-            ],
-          ),
-        );
-      } else {
-        _showErrorDialog("Your BMI is ${bmi.toStringAsFixed(2)}. You are in the \"$category\" range. We advice that you seek the expertise of a Registered Nutritionist-Dietitian to get a personalized patient-centered nutrition consultation and dietary plan. \n\nOnly users in the \"Healthy Weight\" range can proceed.");
-      }
+                );
+              },
+              child: Text("Continue", style: GoogleFonts.poppins(fontSize: 15, color: Color(0xFF0E4A06), fontWeight: FontWeight.w700)),
+            ),
+          ],
+        ),
+      );
     } else {
       _showErrorDialog("Please fill in all the fields to proceed.");
     }

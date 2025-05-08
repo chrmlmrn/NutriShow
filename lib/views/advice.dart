@@ -200,6 +200,32 @@ class MacronutrientAdvicePage extends StatelessWidget {
     return value.toStringAsFixed(2);
   }
 
+  void _showRecommendedIntakeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Color(0xFFCAE0BC),
+        title: Text(
+          "🍽️ Recommended Daily Intake",
+          style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF206C15)),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _buildRecommendedIntakeList(recommendedIntake!, activityLevel),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Close", style: GoogleFonts.poppins(fontSize: 15, color: Color(0xFF0E4A06))),
+          ),
+        ],
+      ),
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -329,152 +355,157 @@ class MacronutrientAdvicePage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20),
-              _buildDietaryAdviceCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "📝 Dietary Assessment",
-                      style: GoogleFonts.poppins(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF4A6FA5),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    if (notice != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: Text(
-                          "ℹ️  $notice",
-                          style: GoogleFonts.nunito(
-                            fontSize: 15.5,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.black87,
-                          ),
+              if (assessment != null || recommendedIntake != null)
+                _buildDietaryAdviceCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "📝 Dietary Assessment",
+                        style: GoogleFonts.poppins(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF4A6FA5),
                         ),
                       ),
-                    const SizedBox(height: 5),
-
-                    Text(
-                      "Too much nutrients (${(assessment?['too_much'] as List?)?.length ?? 0}):",
-                      style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.w700),
-                    ),
-                    if ((assessment?['too_much'] as List?)?.isEmpty ?? true)
-                      Text("⚫  None", style: GoogleFonts.nunito(fontSize: 16.5))
-                    else
-                      ...List.generate(
-                        (assessment!['too_much'] as List).length,
-                            (index) {
-                          String item = assessment!['too_much'][index];
-
-                          final matches = RegExp(r"(-?\d+(\.\d+)?)").allMatches(item).toList();
-
-                          // If there are any numbers found in the string
-                          if (matches.isNotEmpty) {
-                            for (final match in matches) {
-                              final original = match.group(0)!;
-                              final parsed = double.tryParse(original);
-
-                              if (parsed != null) {
-                                final formatted = _formatValue(parsed);
-                                item = item.replaceFirst(original, formatted);
-                              }
-                            }
-                          }
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2.0),
-                            child: Text("🔴  $item", style: GoogleFonts.nunito(fontSize: 16.5)),
-                          );
-                        },
-                      ),
-
-                    const SizedBox(height: 15),
-
-                    Text(
-                      "Lacking nutrients (${(assessment?['lacking'] as List?)?.length ?? 0}):",
-                      style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.w700),
-                    ),
-                    if ((assessment?['lacking'] as List?)?.isEmpty ?? true)
-                      Text("⚫  None", style: GoogleFonts.nunito(fontSize: 16.5))
-                    else
-                      ...List.generate(
-                        (assessment!['lacking'] as List).length,
-                            (index) {
-                          String item = assessment!['lacking'][index];
-
-                          final matches = RegExp(r"(-?\d+(\.\d+)?)").allMatches(item).toList();
-
-                          // If there are any numbers found in the string
-                          if (matches.isNotEmpty) {
-                            for (final match in matches) {
-                              final original = match.group(0)!;
-                              final parsed = double.tryParse(original);
-
-                              if (parsed != null) {
-                                final formatted = _formatValue(parsed);
-                                item = item.replaceFirst(original, formatted);
-                              }
-                            }
-                          }
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2.0),
-                            child: Text("🟡  $item", style: GoogleFonts.nunito(fontSize: 16.5)),
-                          );
-                        },
-                      ),
-
-                    if (recommendedIntake != null)
-                      ...[
-                        const SizedBox(height: 15),
-                        ...(pinnedTips?.map((msg) => Padding(
-                          padding: const EdgeInsets.only(bottom: 6.0),
+                      const SizedBox(height: 15),
+                      if (notice != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
                           child: Text(
-                            msg,
+                            "ℹ️  $notice",
                             style: GoogleFonts.nunito(
-                              fontSize: 16.5,
+                              fontSize: 15.5,
                               fontStyle: FontStyle.italic,
-                              color: Color(0xFFB80000),
+                              color: Colors.black87,
                             ),
                           ),
-                        )).toList() ?? _buildPinnedAdvice())
-                      ]
-                    else
-                      Text("• Not available", style: GoogleFonts.nunito(fontSize: 16.5)),
-                  ],
+                        ),
+                      const SizedBox(height: 5),
+                      if (assessment != null)
+                        ...[
+                          Text(
+                            "Too much nutrients (${(assessment?['too_much'] as List?)?.length ?? 0}):",
+                            style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.w700),
+                          ),
+                          if ((assessment?['too_much'] as List?)?.isEmpty ?? true)
+                            Text("⚫  None", style: GoogleFonts.nunito(fontSize: 16.5))
+                          else
+                            ...List.generate(
+                              (assessment!['too_much'] as List).length,
+                                  (index) {
+                                String item = assessment!['too_much'][index];
+
+                                final matches = RegExp(r"(-?\d+(\.\d+)?)").allMatches(item).toList();
+
+                                // If there are any numbers found in the string
+                                if (matches.isNotEmpty) {
+                                  for (final match in matches) {
+                                    final original = match.group(0)!;
+                                    final parsed = double.tryParse(original);
+
+                                    if (parsed != null) {
+                                      final formatted = _formatValue(parsed);
+                                      item = item.replaceFirst(original, formatted);
+                                    }
+                                  }
+                                }
+
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                                  child: Text("🔴  $item", style: GoogleFonts.nunito(fontSize: 16.5)),
+                                );
+                              },
+                            ),
+                          const SizedBox(height: 15),
+                          Text(
+                            "Lacking nutrients (${(assessment?['lacking'] as List?)?.length ?? 0}):",
+                            style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.w700),
+                          ),
+                          if ((assessment?['lacking'] as List?)?.isEmpty ?? true)
+                            Text("⚫  None", style: GoogleFonts.nunito(fontSize: 16.5))
+                          else
+                            ...List.generate(
+                              (assessment!['lacking'] as List).length,
+                                  (index) {
+                                String item = assessment!['lacking'][index];
+
+                                final matches = RegExp(r"(-?\d+(\.\d+)?)").allMatches(item).toList();
+
+                                // If there are any numbers found in the string
+                                if (matches.isNotEmpty) {
+                                  for (final match in matches) {
+                                    final original = match.group(0)!;
+                                    final parsed = double.tryParse(original);
+
+                                    if (parsed != null) {
+                                      final formatted = _formatValue(parsed);
+                                      item = item.replaceFirst(original, formatted);
+                                    }
+                                  }
+                                }
+
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                                  child: Text("🟡  $item", style: GoogleFonts.nunito(fontSize: 16.5)),
+                                );
+                              },
+                            ),
+                        ],
+                      if (recommendedIntake != null)
+                        ...[
+                          const SizedBox(height: 15),
+                          ...(pinnedTips?.map((msg) => Padding(
+                            padding: const EdgeInsets.only(bottom: 6.0),
+                            child: Text(
+                              msg,
+                              style: GoogleFonts.nunito(
+                                fontSize: 16.5,
+                                fontStyle: FontStyle.italic,
+                                color: Color(0xFFB80000),
+                              ),
+                            ),
+                          )).toList() ?? _buildPinnedAdvice())
+                        ]
+                      else
+                        Text("• Not available", style: GoogleFonts.nunito(fontSize: 16.5)),
+                    ],
+                  ),
                 ),
-              ),
               const SizedBox(height: 20),
-              _buildRecommendedIntakeCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "🍽️ Recommended Nutrient Intake per Day",
-                      style: GoogleFonts.poppins(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF206C15),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    if (recommendedIntake != null)
-                      ...[
-                        ..._buildRecommendedIntakeList(recommendedIntake!, activityLevel)
-                      ]
-                    else
-                      Text("• Not available", style: GoogleFonts.nunito(fontSize: 16.5)),
-                  ],
-                ),
-              ),
+              // if (recommendedIntake != null)
+              //   _buildRecommendedIntakeCard(
+              //     child: Column(
+              //       crossAxisAlignment: CrossAxisAlignment.start,
+              //       children: [
+              //         Text(
+              //           "🍽️ Recommended Nutrient Intake per Day",
+              //           style: GoogleFonts.poppins(
+              //             fontSize: 22,
+              //             fontWeight: FontWeight.bold,
+              //             color: Color(0xFF206C15),
+              //           ),
+              //         ),
+              //         const SizedBox(height: 10),
+              //         ..._buildRecommendedIntakeList(recommendedIntake!, activityLevel),
+              //       ],
+              //     ),
+              //   ),
               const SizedBox(height: 22),
             ],
           ),
         ),
       ),
+      floatingActionButton: (recommendedIntake != null)
+          ? FloatingActionButton(
+        onPressed: () => _showRecommendedIntakeDialog(context),
+        backgroundColor: Color(0xFF206C15),
+        child: Icon(Icons.restaurant_menu, color: Colors.white),
+        tooltip: "View Recommended Intake",
+      )
+          : null,
     );
+
   }
 
   Widget _buildNutritionFactsCard({required Widget child, Color? color, Color borderColor = const Color(0xFFA9C46C)}) {

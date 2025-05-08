@@ -1,18 +1,28 @@
 Adobong sitaw
+Apple
+Avocado
 Banana
 Banana cue
 Boiled egg
 Brown rice
+Caesar salad
+Chicken breast
 Chicken curry
 Chopsuey
 Corn
 Daing na bangus
+Dragonfruit
 Fried galunggong
 Fried tilapia
 Ginataang kalabasa
+Grapes
+Kiwi
 Lumpia
+Melon
 Monggo
 Nilagang baka
+Orange
+Pancake
 Pancit
 Pandesal
 Papaya
@@ -20,7 +30,7 @@ Pineapple
 Pork adobo
 Pork chop
 Rice
-Riped mango
+Ripe mango
 Scrambled egg
 Sunny side up
 Sweet potato

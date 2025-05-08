@@ -146,7 +146,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       final input = await startDetection;
       if (input == null) throw Exception("Failed to preprocess image.");
 
-      final foodOutput = List.filled(30, 0.0).reshape([1, 30]);
+      final foodOutput = List.filled(40, 0.0).reshape([1, 40]);
       _foodInterpreter.run(input, foodOutput);
 
       final predictions = foodOutput[0]

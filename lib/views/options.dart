@@ -480,11 +480,11 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       }
       if (tooMuch.any((e) => e.toLowerCase().contains("fiber"))) {
         pinnedTips.add("📌 ${[
-            "Looks like your fiber intake is higher than needed—consider scaling it back.",
-            "You’re getting more fiber than your body might need—try to balance it out.",
-            "You may be consuming excessive fiber—reduce slightly for smoother digestion.",
-            "Overconsumption of fiber detected—try adjusting your portions.",
-            "Fiber is essential, but your intake exceeds recommendations—ease it up a bit."
+          "Looks like your fiber intake is higher than needed—consider scaling it back.",
+          "You’re getting more fiber than your body might need—try to balance it out.",
+          "You may be consuming excessive fiber—reduce slightly for smoother digestion.",
+          "Overconsumption of fiber detected—try adjusting your portions.",
+          "Fiber is essential, but your intake exceeds recommendations—ease it up a bit."
         ][Random().nextInt(5)]}");
       }
       if (lacking.any((e) => e.toLowerCase().contains("protein"))) {
@@ -516,11 +516,11 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       }
       if (lacking.any((e) => e.toLowerCase().contains("fiber"))) {
         pinnedTips.add("📌 ${[
-            "You may be missing out on enough fiber—consider adding more fiber-rich foods to your meals.",
-            "Fiber intake is currently insufficient—boosting it may support better digestion.",
-            "A bit more fiber in your diet could go a long way—start with small changes.",
-            "Low fiber intake noticed—try to mix in high-fiber foods with your usual dishes.",
-            "You're not quite hitting the fiber target—adjust your meals for better nutritional balance."
+          "You may be missing out on enough fiber—consider adding more fiber-rich foods to your meals.",
+          "Fiber intake is currently insufficient—boosting it may support better digestion.",
+          "A bit more fiber in your diet could go a long way—start with small changes.",
+          "Low fiber intake noticed—try to mix in high-fiber foods with your usual dishes.",
+          "You're not quite hitting the fiber target—adjust your meals for better nutritional balance."
         ][Random().nextInt(5)]}");
       }
 
@@ -559,7 +559,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           _foodResult = null;
           _portionSize = null;
           _foodId = null;
-          _category = foodDetails['category_name'];
+          _category = null;
         });
       });
     } else {
@@ -578,157 +578,157 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF9FEEB),
-      appBar: AppBar(
         backgroundColor: Color(0xFFF9FEEB),
-        iconTheme: IconThemeData(
-          color: Color(0xFF0E4A06),
-          size: 30,
-        ),
-        title: Center(
-          child: Text(
-            'Dish Classification',
-            style: GoogleFonts.nunito(fontSize: 27, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
+        appBar: AppBar(
+          backgroundColor: Color(0xFFF9FEEB),
+          iconTheme: IconThemeData(
+            color: Color(0xFF0E4A06),
+            size: 30,
           ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.history),
-            tooltip: 'History',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FoodHistoryPage()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/screensbg.png',
-              fit: BoxFit.cover,
+          title: Center(
+            child: Text(
+              'Dish Classification',
+              style: GoogleFonts.nunito(fontSize: 27, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
             ),
           ),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(top: 65, left: 20, right: 20, bottom: 30),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.center, // Center the image container
-                    child: Container(
-                      height: 250,
-                      width: 250,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Color(0xFF5D8736), width: 2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: _image != null
-                          ? ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.file(
-                          File(_image!.path),
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                          : const Center(
-                        child: Text(
-                          "No image selected",
-                          style: TextStyle(fontSize: 16, color: Colors.black54),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-                  if (_foodResult != null)
-                    Text(
-                      _foodResult!,
-                      style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: Colors.black87),
-                      textAlign: TextAlign.center,
-                    ),
-                  const SizedBox(height: 6),
-                  if (_portionSize != null)
-                    Text(
-                      "Portion: $_portionSize",
-                      style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black54),
-                    ),
-                  if (_category != null)
-                    Text(
-                      "Category: ${_category!}",
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87),
-                    ),
-                  const SizedBox(height: 20),
-                  Column(
-                    mainAxisSize: MainAxisSize.min, // Ensure all buttons stack up and are centered
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: _takePhoto,
-                        icon: const Icon(Icons.camera_alt),
-                        label: const Text("Take a Photo"),
-                        style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
-                            backgroundColor: Color(0xFFABCB4D),
-                            foregroundColor: Color(0xFF0E4A06)
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      ElevatedButton.icon(
-                        onPressed: _uploadDish,
-                        icon: const Icon(Icons.upload),
-                        label: const Text("Upload from Gallery"),
-                        style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                            backgroundColor: Color(0xFFABCB4D),
-                            foregroundColor: Color(0xFF0E4A06)
-                        ),
-                      ),
-                      const SizedBox(height: 17),
-                      ElevatedButton.icon(
-                        onPressed: _foodId != null ? _showPortionInputDialog : null, // Only allow showing dialog if foodId is set
-                        icon: const Icon(Icons.edit),
-                        label: const Text("Enter Portion"),
-                        style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
-                            backgroundColor: Color(0xFFABCB4D),
-                            foregroundColor: Color(0xFF0E4A06)
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      if (_portionSize == null || _portionSize!.isEmpty)
-                        Text(
-                          "Please enter portion size before viewing result.",
-                          style: TextStyle(color: Colors.red.shade700, fontStyle: FontStyle.italic),
-                        ),
-                      const SizedBox(height: 3),
-                      ElevatedButton.icon(
-                        onPressed: (_foodResult != null && !_foodResult!.contains("Error") && _portionSize != null && _portionSize!.isNotEmpty)
-                            ? _getAdvice
-                            : null,
-                        icon: const Icon(Icons.insights),
-                        label: const Text("View Result"),
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 55, vertical: 14),
-                          backgroundColor: Color(0xFF5D8736),
-                          foregroundColor: Color(0xFFF4FFC3),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.history),
+              tooltip: 'History',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FoodHistoryPage()),
+                );
+              },
+            ),
+          ],
+        ),
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                'assets/screensbg.png',
+                fit: BoxFit.cover,
               ),
             ),
-          ),
-        ],
-      )
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(top: 65, left: 20, right: 20, bottom: 30),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.center, // Center the image container
+                      child: Container(
+                        height: 250,
+                        width: 250,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Color(0xFF5D8736), width: 2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: _image != null
+                            ? ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.file(
+                            File(_image!.path),
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                            : const Center(
+                          child: Text(
+                            "No image selected",
+                            style: TextStyle(fontSize: 16, color: Colors.black54),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 25),
+                    if (_foodResult != null)
+                      Text(
+                        _foodResult!,
+                        style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: Colors.black87),
+                        textAlign: TextAlign.center,
+                      ),
+                    const SizedBox(height: 6),
+                    if (_portionSize != null)
+                      Text(
+                        "Portion: $_portionSize",
+                        style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black54),
+                      ),
+                    if (_category != null)
+                      Text(
+                        "Category: ${_category!}",
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87),
+                      ),
+                    const SizedBox(height: 20),
+                    Column(
+                      mainAxisSize: MainAxisSize.min, // Ensure all buttons stack up and are centered
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: _takePhoto,
+                          icon: const Icon(Icons.camera_alt),
+                          label: const Text("Take a Photo"),
+                          style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
+                              backgroundColor: Color(0xFFABCB4D),
+                              foregroundColor: Color(0xFF0E4A06)
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        ElevatedButton.icon(
+                          onPressed: _uploadDish,
+                          icon: const Icon(Icons.upload),
+                          label: const Text("Upload from Gallery"),
+                          style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                              backgroundColor: Color(0xFFABCB4D),
+                              foregroundColor: Color(0xFF0E4A06)
+                          ),
+                        ),
+                        const SizedBox(height: 17),
+                        ElevatedButton.icon(
+                          onPressed: _foodId != null ? _showPortionInputDialog : null, // Only allow showing dialog if foodId is set
+                          icon: const Icon(Icons.edit),
+                          label: const Text("Enter Portion"),
+                          style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
+                              backgroundColor: Color(0xFFABCB4D),
+                              foregroundColor: Color(0xFF0E4A06)
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        if (_portionSize == null || _portionSize!.isEmpty)
+                          Text(
+                            "Please enter portion size before viewing result.",
+                            style: TextStyle(color: Colors.red.shade700, fontStyle: FontStyle.italic),
+                          ),
+                        const SizedBox(height: 3),
+                        ElevatedButton.icon(
+                          onPressed: (_foodResult != null && !_foodResult!.contains("Error") && _portionSize != null && _portionSize!.isNotEmpty)
+                              ? _getAdvice
+                              : null,
+                          icon: const Icon(Icons.insights),
+                          label: const Text("View Result"),
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 55, vertical: 14),
+                            backgroundColor: Color(0xFF5D8736),
+                            foregroundColor: Color(0xFFF4FFC3),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        )
     );
   }
 }

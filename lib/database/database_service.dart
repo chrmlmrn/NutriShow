@@ -201,6 +201,19 @@ class DatabaseHelper {
     }
   }
 
+  Future<void> saveFoodDiaryEntry(String dishName, String mood, int satiety) async {
+    final db = await database;
+    await db.insert(
+      'food_diary_entries',
+      {
+        'dish_name': dishName.toLowerCase(),
+        'mood': mood,
+        'satiety': satiety,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
 }
 
 extension StringExtension on String {

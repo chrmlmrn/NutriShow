@@ -136,7 +136,9 @@ class _UserInputScreenState extends State<UserInputScreen> {
           content: Text(
             category == "Healthy Weight"
                 ? "You're doing well! A BMI of ${bmi.toStringAsFixed(2)} puts you in the \"Healthy Weight\" category. Keep it up!"
-                : "Your BMI is ${bmi.toStringAsFixed(2)}. You are in the \"$category\" range. We advice that you seek the expertise of a Registered Nutritionist-Dietitian to get a personalized patient-centered nutrition consultation and dietary plan. \n\nNote: You may still use the app and view nutritional content, but dietary assessment will be disabled.",
+                : "Your BMI is ${bmi.toStringAsFixed(2)}. You are in the \"$category\" range. We advice that you seek the expertise of a "
+                "Registered Nutritionist-Dietitian to get a personalized patient-centered nutrition consultation and dietary plan. "
+                "\n\nNote: You may still use the app and view nutritional content, but dietary assessment will be disabled.",
           ),
           actions: [
             TextButton(
@@ -219,8 +221,8 @@ class _UserInputScreenState extends State<UserInputScreen> {
                 const SizedBox(height: 60),
                 Text(
                   'User Metrics',
-                  style: GoogleFonts.nunito(
-                    fontSize: 34.5,
+                  style: GoogleFonts.poppins(
+                    fontSize: 32,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF0E4A06),
                   ),
@@ -233,7 +235,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                     filled: true,
                     fillColor: Color(0xFFF9FEED),
                     labelText: 'Age',
-                    labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                    labelStyle: GoogleFonts.poppins(color: Color(0xFF0E4A06)),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
                       borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
@@ -262,7 +264,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                     filled: true,
                     fillColor: Color(0xFFF9FEED),
                     labelText: 'Sex',
-                    labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                    labelStyle: GoogleFonts.poppins(color: Color(0xFF0E4A06)),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
                       borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
@@ -284,7 +286,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                           filled: true,
                           fillColor: Color(0xFFF9FEED),
                           labelText: _isKg ? 'Weight (kg)' : 'Weight (lbs)',
-                          labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                          labelStyle: GoogleFonts.poppins(color: Color(0xFF0E4A06)),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(5),
                             borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
@@ -332,7 +334,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                           filled: true,
                           fillColor: Color(0xFFF9FEED),
                           labelText: 'Height (cm)',
-                          labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                          labelStyle: GoogleFonts.poppins(color: Color(0xFF0E4A06)),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(5),
                             borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
@@ -353,7 +355,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                                 filled: true,
                                 fillColor: Color(0xFFF9FEED),
                                 labelText: 'Feet',
-                                labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                                labelStyle: GoogleFonts.poppins(color: Color(0xFF0E4A06)),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(5),
                                   borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
@@ -374,7 +376,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                                 filled: true,
                                 fillColor: Color(0xFFF9FEED),
                                 labelText: 'Inches',
-                                labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                                labelStyle: GoogleFonts.poppins(color: Color(0xFF0E4A06)),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(5),
                                   borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
@@ -435,7 +437,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                     filled: true,
                     fillColor: Color(0xFFF9FEED),
                     labelText: 'Activity Level',
-                    labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
+                    labelStyle: GoogleFonts.poppins(color: Color(0xFF0E4A06)),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
                       borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
@@ -467,7 +469,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                     ),
                     child: Text(
                       "Submit",
-                      style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.poppins(fontSize: 16.5, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

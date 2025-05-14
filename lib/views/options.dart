@@ -61,9 +61,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     final rawImage = await imageFile.readAsBytes();
     final image = img.decodeImage(Uint8List.fromList(rawImage));
 
-    if (image == null) {
-      throw Exception("Failed to decode image.");
-    }
+    if (image == null) {throw Exception("Failed to decode image.");}
 
     final resizedImage = img.copyResize(image, width: 224, height: 224);
 
@@ -202,11 +200,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
 
       String foodName = predictions[0]["label"];
 
-      // Wait for both detection and 2 seconds
-      await Future.wait([
-        Future.value(), // optional placeholder
-        enforcedDelay
-      ]);
+      await Future.wait([Future.value(), enforcedDelay]);
 
       setState(() {
         _foodResult = foodName;
@@ -230,7 +224,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         _foodResult = "Error during inference.";
       });
     } finally {
-      Navigator.pop(context); // close loading dialog
+      Navigator.pop(context);
     }
 
   }
@@ -288,7 +282,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       if (foodIdResult.isNotEmpty) {
         String foodUid = foodIdResult.first['food_uid'] as String;
 
-        // Get portion and serving size
         var result = await db.rawQuery(
           '''
         SELECT portion, serving_size
@@ -355,13 +348,11 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     );
   }
 
-  // This method will query the database to get the portion type for the given foodId
   Future<String> _getPortionTypeFromDatabase(String foodName) async {
     DatabaseHelper dbHelper = DatabaseHelper();
 
     try {
-      // Step 1: Fetch the food_uid from the food_items table using food_name
-      final db = await dbHelper.database; // Get the database instance
+      final db = await dbHelper.database;
       var foodIdResult = await db.rawQuery(
         '''
       SELECT food_uid
@@ -374,7 +365,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
       if (foodIdResult.isNotEmpty) {
         String foodUid = foodIdResult.first['food_uid'] as String;
 
-        // Step 2: Query the portion type from the food_servings table using the food_uid
         var result = await db.rawQuery(
           '''
         SELECT portion
@@ -384,7 +374,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           [foodUid],
         );
 
-        // Check if the result is not empty and return the portion
         if (result.isNotEmpty && result.first['portion'] != null) {
           return result.first['portion'] as String;
         } else {
@@ -399,20 +388,15 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
   }
 
   Future<void> _getAdvice() async {
-
     if (widget.bmiCategory != "Healthy Weight") {
-      // No assessment, just show nutrition content
       DatabaseHelper dbHelper = DatabaseHelper();
       Map<String, dynamic>? foodDetails = await dbHelper.getFoodDetails(_foodResult!);
 
       if (foodDetails != null) {
         await FoodHistory.addToHistory(
-          foodDetails: {
-            ...foodDetails,
-            'activity_level': widget.activityLevel,
-          },
-          assessment: null, // ❌ No assessment
-          recommendedIntake: null, // ❌ No intake
+          foodDetails: {...foodDetails, 'activity_level': widget.activityLevel,},
+          assessment: null,
+          recommendedIntake: null,
           gender: widget.gender,
           portionSize: _portionSize,
           notice: null,
@@ -674,7 +658,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           title: Center(
             child: Text(
               'Dish Classification',
-              style: GoogleFonts.nunito(fontSize: 27, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
+              style: GoogleFonts.poppins(fontSize: 25, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
             ),
           ),
           actions: [
@@ -739,15 +723,15 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                         textAlign: TextAlign.center,
                       ),
                     const SizedBox(height: 6),
-                    if (_portionSize != null)
-                      Text(
-                        "Portion: $_portionSize",
-                        style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black54),
-                      ),
                     if (_category != null)
                       Text(
                         "Category: ${_category!}",
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87),
+                      ),
+                    if (_portionSize != null)
+                      Text(
+                        "Portion: $_portionSize",
+                        style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black54),
                       ),
                     const SizedBox(height: 20),
                     Column(

@@ -17,281 +17,262 @@ class FoodHistoryPage extends StatelessWidget {
         iconTheme: const IconThemeData(color: Color(0xFF0E4A06), size: 30),
         title: Text(
           'Food History',
-          style: GoogleFonts.nunito(
-            fontSize: 30,
+          style: GoogleFonts.poppins(
+            fontSize: 25,
             fontWeight: FontWeight.w800,
             color: const Color(0xFF0E4A06),
           ),
         ),
       ),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/screensbg.png',
-              fit: BoxFit.cover,
+      body:
+        Stack(
+          fit: StackFit.expand,
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                'assets/screensbg.png',
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          FutureBuilder<List<Map<String, dynamic>>>(
-            future: FoodHistory.getHistory(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(
-                  child: Text(
-                    "No food history yet.",
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
-                  ),
-                );
-              }
-
-              final history = snapshot.data!;
-
-              double totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
-
-              for (var item in history) {
-                final portionSize = double.tryParse(item['portionSize']?.toString() ?? '') ?? 1.0;
-                final food = item['foodDetails'] ?? {};
-
-                double parseDouble(dynamic value) {
-                  if (value == null) return 0;
-                  return double.tryParse(value.toString()) ?? 0;
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: FoodHistory.getHistory(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
                 }
 
-                totalCalories += parseDouble(food['energy_kcal']) * portionSize;
-                totalProtein += parseDouble(food['protein_g']) * portionSize;
-                totalCarbs += parseDouble(food['carbohydrates_g']) * portionSize;
-                totalFat += parseDouble(food['total_fat_g']) * portionSize;
-              }
-
-              final nutrientSections = [
-                PieChartSectionData(
-                  value: totalProtein,
-                  title: '',
-                  color: const Color(0xFF5D8736),
-                  radius: 90,
-                ),
-                PieChartSectionData(
-                  value: totalCarbs,
-                  title: '',
-                  color: const Color(0xFFFFDA5C),
-                  radius: 90,
-                ),
-                PieChartSectionData(
-                  value: totalFat,
-                  title: '',
-                  color: const Color(0xFFAAD3C4),
-                  radius: 90,
-                ),
-              ];
-
-              return ListView(
-                padding: const EdgeInsets.all(12),
-                children: [
-                  const SizedBox(height: 10),
-                  Text(
-                    "Total Nutrients Breakdown",
-                    style: GoogleFonts.nunito(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF0E4A06),
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "No food history yet.",
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
                     ),
-                    textAlign: TextAlign.center,
+                  );
+                }
+
+                final history = snapshot.data!;
+
+                double totalCalories = 0, totalProtein = 0;
+                double totalCarbs = 0, totalFat = 0;
+
+                for (var item in history) {
+                  final portionSize = double.tryParse(item['portionSize']?.toString() ?? '') ?? 1.0;
+                  final food = item['foodDetails'] ?? {};
+
+                  double parseDouble(dynamic value) {
+                    if (value == null) return 0;
+                    return double.tryParse(value.toString()) ?? 0;
+                  }
+
+                  totalCalories += parseDouble(food['energy_kcal']) * portionSize;
+                  totalProtein += parseDouble(food['protein_g']) * portionSize;
+                  totalCarbs += parseDouble(food['carbohydrates_g']) * portionSize;
+                  totalFat += parseDouble(food['total_fat_g']) * portionSize;
+                }
+
+                final nutrientSections = [
+                  PieChartSectionData(
+                    value: totalProtein, title: '', color: const Color(0xFF5D8736), radius: 90,
                   ),
-                  const SizedBox(height: 15),
-                  Center(
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 12),
-                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF4FFC3),
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: Color(0xFFABCB4D), width: 1.8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
+                  PieChartSectionData(
+                    value: totalCarbs, title: '', color: const Color(0xFFFFDA5C), radius: 90,
+                  ),
+                  PieChartSectionData(
+                    value: totalFat, title: '', color: const Color(0xFFAAD3C4), radius: 90,
+                  ),
+                ];
+
+                return ListView(
+                  padding: const EdgeInsets.all(12),
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                      "Total Nutrients Breakdown",
+                      style: GoogleFonts.poppins(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0E4A06),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.local_fire_department, color: Color(0xFFABCB4D), size: 26),
-                          const SizedBox(width: 10),
-                          Text(
-                            "Calories: ",
-                            style: GoogleFonts.nunito(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF0E4A06),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 15),
+                    Center(
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF4FFC3),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: Color(0xFFABCB4D), width: 1.8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
                             ),
-                          ),
-                          Text(
-                            "${totalCalories.toStringAsFixed(2)} kcal",
-                            style: GoogleFonts.poppins(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF914F1E),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(
-                    height: 250,
-                    child: PieChart(
-                      PieChartData(
-                        sections: nutrientSections,
-                        centerSpaceRadius: 0,
-                        sectionsSpace: 4,
-                      ),
-                    ),
-                  ),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 16,
-                    runSpacing: 8,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(width: 14, height: 14, decoration: BoxDecoration(color: Color(0xFF5D8736), shape: BoxShape.circle)),
-                          const SizedBox(width: 6),
-                          Text("Protein: ${totalProtein.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize: 15)),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(width: 14, height: 14, decoration: BoxDecoration(color: Color(0xFFFFDA5C), shape: BoxShape.circle)),
-                          const SizedBox(width: 6),
-                          Text("Carbs: ${totalCarbs.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize: 15)),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(width: 14, height: 14, decoration: BoxDecoration(color: Color(0xFFAAD3C4), shape: BoxShape.circle)),
-                          const SizedBox(width: 6),
-                          Text("Fat: ${totalFat.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize: 15)),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 25),
-
-                  ...List.generate(history.length, (index) {
-                    final item = history[index];
-                    final foodDetails = item['foodDetails'] ?? {};
-                    final assessment = item['assessment'];
-                    final recommendedIntake = item['recommendedIntake'];
-                    final gender = item['gender'];
-                    final portionSize = double.tryParse(item['portionSize']?.toString() ?? '') ?? 1.0;
-
-                    double parseDouble(dynamic value) {
-                      if (value == null) return 0;
-                      return double.tryParse(value.toString()) ?? 0;
-                    }
-
-                    double calories = parseDouble(foodDetails['energy_kcal']) * portionSize;
-                    double protein = parseDouble(foodDetails['protein_g']) * portionSize;
-                    double carbs = parseDouble(foodDetails['carbohydrates_g']) * portionSize;
-                    double fat = parseDouble(foodDetails['total_fat_g']) * portionSize;
-
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(28),
-                          side: const BorderSide(color: Color(0xFFafb992), width: 2),
+                          ],
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFD3F1DF),
-                              borderRadius: BorderRadius.circular(24),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.local_fire_department, color: Color(0xFFABCB4D), size: 26),
+                            const SizedBox(width: 10),
+                            Text(
+                              "Calories: ",
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF0E4A06),
+                              ),
                             ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(16),
-                              leading: CircleAvatar(
-                                radius: 24,
-                                backgroundColor: const Color(0xFFAAD3C4),
-                                child: Text(
-                                  '${index + 1}',
+                            Text(
+                              "${totalCalories.toStringAsFixed(2)} kcal",
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF914F1E),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(
+                      height: 250,
+                      child: PieChart(
+                        PieChartData(sections: nutrientSections, centerSpaceRadius: 0, sectionsSpace: 4),
+                      ),
+                    ),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 16, runSpacing: 8,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(width: 14, height: 14, decoration: BoxDecoration(color: Color(0xFF5D8736), shape: BoxShape.circle)),
+                            const SizedBox(width: 6),
+                            Text("Protein: ${totalProtein.toStringAsFixed(2)} g", style: GoogleFonts.poppins(fontSize: 15)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(width: 14, height: 14, decoration: BoxDecoration(color: Color(0xFFFFDA5C), shape: BoxShape.circle)),
+                            const SizedBox(width: 6),
+                            Text("Carbs: ${totalCarbs.toStringAsFixed(2)} g", style: GoogleFonts.poppins(fontSize: 15)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(width: 14, height: 14, decoration: BoxDecoration(color: Color(0xFFAAD3C4), shape: BoxShape.circle)),
+                            const SizedBox(width: 6),
+                            Text("Fat: ${totalFat.toStringAsFixed(2)} g", style: GoogleFonts.poppins(fontSize: 15)),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 25),
+
+                    ...List.generate(history.length, (index) {
+                      final item = history[index];
+                      final foodDetails = item['foodDetails'] ?? {};
+                      final assessment = item['assessment'];
+                      final recommendedIntake = item['recommendedIntake'];
+                      final gender = item['gender'];
+                      final portionSize = double.tryParse(item['portionSize']?.toString() ?? '') ?? 1.0;
+
+                      double parseDouble(dynamic value) {
+                        if (value == null) return 0;
+                        return double.tryParse(value.toString()) ?? 0;
+                      }
+
+                      double calories = parseDouble(foodDetails['energy_kcal']) * portionSize;
+                      double protein = parseDouble(foodDetails['protein_g']) * portionSize;
+                      double carbs = parseDouble(foodDetails['carbohydrates_g']) * portionSize;
+                      double fat = parseDouble(foodDetails['total_fat_g']) * portionSize;
+
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                            side: const BorderSide(color: Color(0xFFafb992), width: 2),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD3F1DF), borderRadius: BorderRadius.circular(24),
+                              ),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(16),
+                                leading: CircleAvatar(
+                                  radius: 24,
+                                  backgroundColor: const Color(0xFFAAD3C4),
+                                  child: Text(
+                                    '${index + 1}',
+                                    style: GoogleFonts.poppins(color: const Color(0xFF0E4A06),
+                                      fontSize: 18, fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                title: Text(
+                                  foodDetails['food_name'] ?? "Unknown Dish",
                                   style: GoogleFonts.poppins(
+                                    fontSize: 21,
+                                    fontWeight: FontWeight.w600,
                                     color: const Color(0xFF0E4A06),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
-                              title: Text(
-                                foodDetails['food_name'] ?? "Unknown Dish",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 21,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF0E4A06),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("🥣 ${formatValue(portionSize, item['portionSize']?.toString())} portion(s)", style: GoogleFonts.poppins(fontSize: 15, fontStyle: FontStyle.italic, color: Colors.black87)),
+                                    const SizedBox(height: 8),
+                                    Text("Calories: ${formatValue(calories, item['portionSize']?.toString())} kcal", style: GoogleFonts.poppins(fontSize: 15)),
+                                    Text("Protein: ${formatValue(protein, item['portionSize']?.toString())} g", style: GoogleFonts.poppins(fontSize: 15)),
+                                    Text("Carbs: ${formatValue(carbs, item['portionSize']?.toString())} g", style: GoogleFonts.poppins(fontSize: 15)),
+                                    Text("Fat: ${formatValue(fat, item['portionSize']?.toString())} g", style: GoogleFonts.poppins(fontSize: 15)),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "🕒 ${DateTime.tryParse(item['timestamp'] ?? '')?.toLocal().toString().split('.')[0] ?? 'Unknown time'}",
+                                      style: GoogleFonts.poppins(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.grey[700]),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("🥣 ${formatValue(portionSize, item['portionSize']?.toString())} portion(s)", style: GoogleFonts.nunito(fontSize: 15, fontStyle: FontStyle.italic, color: Colors.black87)),
-                                  const SizedBox(height: 8),
-                                  Text("Calories: ${formatValue(calories, item['portionSize']?.toString())} kcal", style: GoogleFonts.nunito(fontSize: 15)),
-                                  Text("Protein: ${formatValue(protein, item['portionSize']?.toString())} g", style: GoogleFonts.nunito(fontSize: 15)),
-                                  Text("Carbs: ${formatValue(carbs, item['portionSize']?.toString())} g", style: GoogleFonts.nunito(fontSize: 15)),
-                                  Text("Fat: ${formatValue(fat, item['portionSize']?.toString())} g", style: GoogleFonts.nunito(fontSize: 15)),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    "🕒 ${DateTime.tryParse(item['timestamp'] ?? '')?.toLocal().toString().split('.')[0] ?? 'Unknown time'}",
-                                    style: GoogleFonts.nunito(
-                                      fontSize: 14,
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.grey[700],
+                                trailing: const Icon(Icons.arrow_forward_ios, size: 24, color: Color(0xFF0E4A06)),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => MacronutrientAdvicePage(
+                                        foodDetails: foodDetails,
+                                        assessment: assessment,
+                                        recommendedIntake: recommendedIntake,
+                                        gender: gender,
+                                        portionSize: item['portionSize'],
+                                        pinnedTips: (item['pinnedTips'] as String?)?.split('|'),
+                                        notice: item['notice'],
+                                        activityLevel: foodDetails['activity_level'] ?? 'active',
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
-                              trailing: const Icon(Icons.arrow_forward_ios, size: 24, color: Color(0xFF0E4A06)),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => MacronutrientAdvicePage(
-                                      foodDetails: foodDetails,
-                                      assessment: assessment,
-                                      recommendedIntake: recommendedIntake,
-                                      gender: gender,
-                                      portionSize: item['portionSize'],
-                                      pinnedTips: (item['pinnedTips'] as String?)?.split('|'),
-                                      notice: item['notice'],
-                                      activityLevel: foodDetails['activity_level'] ?? 'active',
-                                    ),
-                                  ),
-                                );
-                              },
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
+                      );
+                    }),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
     );
   }
 }

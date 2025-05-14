@@ -674,7 +674,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           title: Center(
             child: Text(
               'Dish Classification',
-              style: GoogleFonts.nunito(fontSize: 27, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
+              style: GoogleFonts.poppins(fontSize: 27, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
             ),
           ),
           actions: [
@@ -739,15 +739,16 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                         textAlign: TextAlign.center,
                       ),
                     const SizedBox(height: 6),
-                    if (_portionSize != null)
-                      Text(
-                        "Portion: $_portionSize",
-                        style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black54),
-                      ),
                     if (_category != null)
                       Text(
                         "Category: ${_category!}",
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87),
+                      ),
+                    const SizedBox(height: 3),
+                    if (_portionSize != null)
+                      Text(
+                        "Portion: $_portionSize",
+                        style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black87),
                       ),
                     const SizedBox(height: 20),
                     Column(

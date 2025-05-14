@@ -57,8 +57,8 @@ class SplashScreenState extends State<SplashScreen> {
                 const SizedBox(height: 6),
                 Text(
                   'Image In, Insights Out: \nTrack your food without a doubt',
-                  style: GoogleFonts.nunito(
-                    fontSize: 20,
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFFF4FFC3).withOpacity(0.6),
                   ),

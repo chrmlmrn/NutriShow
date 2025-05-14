@@ -16,12 +16,8 @@ class FoodHistoryPage extends StatelessWidget {
         backgroundColor: const Color(0xFFF9FEEB),
         iconTheme: const IconThemeData(color: Color(0xFF0E4A06), size: 30),
         title: Text(
-          'Food History',
-          style: GoogleFonts.nunito(
-            fontSize: 30,
-            fontWeight: FontWeight.w800,
-            color: const Color(0xFF0E4A06),
-          ),
+          '        Food History',
+          style: GoogleFonts.poppins(fontSize: 27, fontWeight: FontWeight.w800, color: Color(0xFF0E4A06)),
         ),
       ),
       body: Stack(
@@ -95,8 +91,8 @@ class FoodHistoryPage extends StatelessWidget {
                   const SizedBox(height: 10),
                   Text(
                     "Total Nutrients Breakdown",
-                    style: GoogleFonts.nunito(
-                      fontSize: 24,
+                    style: GoogleFonts.poppins(
+                      fontSize: 22.5,
                       fontWeight: FontWeight.w800,
                       color: Color(0xFF0E4A06),
                     ),
@@ -126,7 +122,7 @@ class FoodHistoryPage extends StatelessWidget {
                           const SizedBox(width: 10),
                           Text(
                             "Calories: ",
-                            style: GoogleFonts.nunito(
+                            style: GoogleFonts.poppins(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: Color(0xFF0E4A06),
@@ -165,7 +161,7 @@ class FoodHistoryPage extends StatelessWidget {
                         children: [
                           Container(width: 14, height: 14, decoration: BoxDecoration(color: Color(0xFF5D8736), shape: BoxShape.circle)),
                           const SizedBox(width: 6),
-                          Text("Protein: ${totalProtein.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize: 15)),
+                          Text("Protein: ${totalProtein.toStringAsFixed(2)} g", style: GoogleFonts.poppins(fontSize: 15)),
                         ],
                       ),
                       Row(
@@ -173,7 +169,7 @@ class FoodHistoryPage extends StatelessWidget {
                         children: [
                           Container(width: 14, height: 14, decoration: BoxDecoration(color: Color(0xFFFFDA5C), shape: BoxShape.circle)),
                           const SizedBox(width: 6),
-                          Text("Carbs: ${totalCarbs.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize: 15)),
+                          Text("Carbs: ${totalCarbs.toStringAsFixed(2)} g", style: GoogleFonts.poppins(fontSize: 15)),
                         ],
                       ),
                       Row(
@@ -181,7 +177,7 @@ class FoodHistoryPage extends StatelessWidget {
                         children: [
                           Container(width: 14, height: 14, decoration: BoxDecoration(color: Color(0xFFAAD3C4), shape: BoxShape.circle)),
                           const SizedBox(width: 6),
-                          Text("Fat: ${totalFat.toStringAsFixed(2)} g", style: GoogleFonts.nunito(fontSize: 15)),
+                          Text("Fat: ${totalFat.toStringAsFixed(2)} g", style: GoogleFonts.poppins(fontSize: 15)),
                         ],
                       ),
                     ],
@@ -245,16 +241,16 @@ class FoodHistoryPage extends StatelessWidget {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("🥣 ${formatValue(portionSize, item['portionSize']?.toString())} portion(s)", style: GoogleFonts.nunito(fontSize: 15, fontStyle: FontStyle.italic, color: Colors.black87)),
+                                  Text("🥣 ${formatValue(portionSize, item['portionSize']?.toString())} portion(s)", style: GoogleFonts.poppins(fontSize: 15, fontStyle: FontStyle.italic, color: Colors.black87)),
                                   const SizedBox(height: 8),
-                                  Text("Calories: ${formatValue(calories, item['portionSize']?.toString())} kcal", style: GoogleFonts.nunito(fontSize: 15)),
-                                  Text("Protein: ${formatValue(protein, item['portionSize']?.toString())} g", style: GoogleFonts.nunito(fontSize: 15)),
-                                  Text("Carbs: ${formatValue(carbs, item['portionSize']?.toString())} g", style: GoogleFonts.nunito(fontSize: 15)),
-                                  Text("Fat: ${formatValue(fat, item['portionSize']?.toString())} g", style: GoogleFonts.nunito(fontSize: 15)),
+                                  Text("Calories: ${formatValue(calories, item['portionSize']?.toString())} kcal", style: GoogleFonts.poppins(fontSize: 15)),
+                                  Text("Protein: ${formatValue(protein, item['portionSize']?.toString())} g", style: GoogleFonts.poppins(fontSize: 15)),
+                                  Text("Carbs: ${formatValue(carbs, item['portionSize']?.toString())} g", style: GoogleFonts.poppins(fontSize: 15)),
+                                  Text("Fat: ${formatValue(fat, item['portionSize']?.toString())} g", style: GoogleFonts.poppins(fontSize: 15)),
                                   const SizedBox(height: 8),
                                   Text(
                                     "🕒 ${DateTime.tryParse(item['timestamp'] ?? '')?.toLocal().toString().split('.')[0] ?? 'Unknown time'}",
-                                    style: GoogleFonts.nunito(
+                                    style: GoogleFonts.poppins(
                                       fontSize: 14,
                                       fontStyle: FontStyle.italic,
                                       color: Colors.grey[700],

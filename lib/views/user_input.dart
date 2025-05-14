@@ -219,8 +219,8 @@ class _UserInputScreenState extends State<UserInputScreen> {
                 const SizedBox(height: 60),
                 Text(
                   'User Metrics',
-                  style: GoogleFonts.nunito(
-                    fontSize: 34.5,
+                  style: GoogleFonts.poppins(
+                    fontSize: 33,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF0E4A06),
                   ),
@@ -467,7 +467,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                     ),
                     child: Text(
                       "Submit",
-                      style: GoogleFonts.nunito(fontSize: 16.5, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.poppins(fontSize: 16.5, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

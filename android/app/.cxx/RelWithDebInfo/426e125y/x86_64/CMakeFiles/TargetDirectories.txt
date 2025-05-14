@@ -1,0 +1,2 @@
+D:/GitHub/NutriShow/android/app/.cxx/RelWithDebInfo/426e125y/x86_64/CMakeFiles/edit_cache.dir
+D:/GitHub/NutriShow/android/app/.cxx/RelWithDebInfo/426e125y/x86_64/CMakeFiles/rebuild_cache.dir

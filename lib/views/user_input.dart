@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:nutrishow/views/about_us.dart';
 import 'options.dart';
 
 class UserInputView extends StatelessWidget {
@@ -200,19 +201,35 @@ class _UserInputScreenState extends State<UserInputScreen> {
               children: <Widget>[
                 const SizedBox(height: 50),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Image.asset(
-                      'assets/logo.png',
-                      height: 70,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/logo.png',
+                          height: 70,
+                        ),
+                        const SizedBox(width: 15),
+                        Text(
+                          'NutriShow',
+                          style: GoogleFonts.changaOne(
+                            fontSize: 50,
+                            color: Color(0xFF0E4A06),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 15),
-                    Text(
-                      'NutriShow',
-                      style: GoogleFonts.changaOne(
-                        fontSize: 50,
-                        color: Color(0xFF0E4A06), // Adjust color to fit your theme
-                      ),
+                    IconButton(
+                      icon: Icon(Icons.info_outline, color: Color(0xFF0E4A06), size: 30),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AboutUsScreen(), // Make sure this screen exists
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

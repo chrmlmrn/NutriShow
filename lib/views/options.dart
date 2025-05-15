@@ -171,7 +171,15 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         }
       }
 
-      String foodName = predictions[0]["label"];
+      // Get top 3 predictions and format them into Strings
+      final List<String> top3 = predictions.take(3).map<String>((p) {
+        final label = p['label'] as String;
+        final conf = ((p['confidence'] as double) * 100).toStringAsFixed(2);
+        return "$label – $conf%";
+      }).toList();
+
+      double confidence = predictions[0]['confidence'] as double;
+      String foodName = confidence >= 0.60 ? predictions[0]['label'] as String : "Unknown";
 
       await Future.wait([
         Future.value(),
@@ -182,6 +190,38 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         _foodResult = foodName;
         _foodId = foodName;
       });
+
+      if (foodName == "Unknown") {
+        // SHOW POPUP with List<Widget> from List<String>
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Color(0xFFF4FBEF),
+              title: Text(
+                "Top 3 Classified Foods",
+                style: GoogleFonts.poppins(
+                    fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0E4A06)),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: top3
+                    .map((e) => Text("• $e", style: GoogleFonts.poppins(fontSize: 16)))
+                    .toList(),
+              ),
+              actions: [
+                TextButton(
+                  child: Text("OK", style: GoogleFonts.poppins(color: Color(0xFF0E4A06))),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            );
+          },
+        );
+
+        return;
+      }
 
       Map<String, dynamic>? foodDetails = await dbHelper.getFoodDetails(foodName);
 
@@ -213,6 +253,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         _foodResult = null;
         _portionSize = null;
         _foodId = null;
+        _category = null;
       });
       await _runDetection();
     }
@@ -226,6 +267,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         _foodResult = null;
         _portionSize = null;
         _foodId = null;
+        _category = null;
       });
       await _runDetection();
     }
@@ -710,7 +752,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                         textAlign: TextAlign.center,
                       ),
                     const SizedBox(height: 6),
-                    if (_category != null)
+                    if (_category != null && _foodResult != "Unknown")
                       Text(
                         "Category: ${_category!}",
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87),
@@ -748,7 +790,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                         ),
                         const SizedBox(height: 17),
                         ElevatedButton.icon(
-                          onPressed: _foodId != null ? _showPortionInputDialog : null,
+                          onPressed: (_foodId != null && _foodResult != "Unknown") ? _showPortionInputDialog : null,
                           icon: const Icon(Icons.edit),
                           label: const Text("Enter Portion"),
                           style: ElevatedButton.styleFrom(

@@ -47,16 +47,19 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     _loadModel();
   }
 
+  // load the model
   Future<void> _loadModel() async {
     _foodInterpreter = await Interpreter.fromAsset('assets/mobilenetv2_food_classifier.tflite');
     _labels = await _loadLabels('assets/labels.txt');
   }
 
+  // load the label
   Future<List<String>> _loadLabels(String path) async {
     final labels = await DefaultAssetBundle.of(context).loadString(path);
     return labels.split('\n');
   }
 
+  // Converts and normalizes an image to 224x224 with pixel values scaled [-1, 1]
   Future<List<List<List<List<double>>>>?> _preprocessImage(File imageFile) async {
     final rawImage = await imageFile.readAsBytes();
     final image = img.decodeImage(Uint8List.fromList(rawImage));
@@ -82,24 +85,22 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     return inputTensor;
   }
 
+  // Runs image classification and handles category + portion metadata retrieval
   Future<void> _runDetection() async {
     if (_image == null) return;
 
-    // Show aesthetic loading dialog
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Stack(
           children: [
-            // Blur + dim background
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
               child: Container(
                 color: Colors.black.withOpacity(0.2),
               ),
             ),
-            // Centered loader card
             Center(
               child: Container(
                 padding: const EdgeInsets.all(25),
@@ -159,7 +160,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
           .toList()
         ..sort((a, b) => (b['confidence'] as double).compareTo(a['confidence'] as double));
 
-      // Get top N categories from predictions
       final dbHelper = DatabaseHelper();
       final Set<String> categorySet = {};
 
@@ -171,40 +171,10 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         }
       }
 
-      // Show dialog with top categories
-      // await showDialog(
-      //   context: context,
-      //   builder: (BuildContext context) {
-      //     return AlertDialog(
-      //       backgroundColor: Color(0xFFF0FBEF),
-      //       title: Text(
-      //         "Detected Categories",
-      //         style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0E4A06)),
-      //       ),
-      //       content: Column(
-      //         mainAxisSize: MainAxisSize.min,
-      //         crossAxisAlignment: CrossAxisAlignment.start,
-      //         children: categorySet.map((category) => Text(
-      //           "• $category",
-      //           style: GoogleFonts.poppins(fontSize: 16, color: Colors.black87),
-      //         )).toList(),
-      //       ),
-      //       actions: [
-      //         TextButton(
-      //           child: Text("OK", style: GoogleFonts.poppins(color: Color(0xFF0E4A06))),
-      //           onPressed: () => Navigator.pop(context),
-      //         ),
-      //       ],
-      //     );
-      //   },
-      // );
-
-
       String foodName = predictions[0]["label"];
 
-      // Wait for both detection and 2 seconds
       await Future.wait([
-        Future.value(), // optional placeholder
+        Future.value(),
         enforcedDelay
       ]);
 
@@ -261,6 +231,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     }
   }
 
+  // Dialog to let user enter how many portions they consumed (e.g. 1.5)
   Future<void> _showPortionInputDialog() async {
     if (_foodId == null) {
       return;
@@ -355,7 +326,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     );
   }
 
-  // This method will query the database to get the portion type for the given foodId
+  // Gets the portion type (e.g. piece, slice, cup) for a given food from the database
   Future<String> _getPortionTypeFromDatabase(String foodName) async {
     DatabaseHelper dbHelper = DatabaseHelper();
 
@@ -398,6 +369,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     }
   }
 
+  // Core function to assess the food's nutrient content against user-specific needs
   Future<void> _getAdvice() async {
 
     if (widget.bmiCategory != "Healthy Weight") {
@@ -411,8 +383,8 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
             ...foodDetails,
             'activity_level': widget.activityLevel,
           },
-          assessment: null, // ❌ No assessment
-          recommendedIntake: null, // ❌ No intake
+          assessment: null,
+          recommendedIntake: null,
           gender: widget.gender,
           portionSize: _portionSize,
           notice: null,
@@ -441,9 +413,8 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         );
       }
 
-      return; // ✅ Exit early — no dietary logic
+      return;
     }
-
 
     if (_foodResult == null) return;
 
@@ -467,7 +438,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         portionSize: _portionSize,
       );
 
-      // 🧠 Dietary Tips
+      // Dietary Tips
       final List<String> bothTips = [
         "Please make sure to cut the nutrient intake for those with too much and consume more for those lacking/less.",
         "Make necessary dietary changes by limiting overconsumed nutrients and increasing those that are lacking.",
@@ -623,7 +594,6 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
         pinnedTips: pinnedTips.join('|'),
       );
 
-      // Navigate to advice page with selected tip
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -655,6 +625,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
     }
   }
 
+  // Dispose of interpreter to free memory when screen is closed
   @override
   void dispose() {
     _foodInterpreter.close();
@@ -706,7 +677,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Align(
-                      alignment: Alignment.center, // Center the image container
+                      alignment: Alignment.center,
                       child: Container(
                         height: 250,
                         width: 250,
@@ -752,7 +723,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                       ),
                     const SizedBox(height: 20),
                     Column(
-                      mainAxisSize: MainAxisSize.min, // Ensure all buttons stack up and are centered
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         ElevatedButton.icon(
                           onPressed: _takePhoto,
@@ -777,7 +748,7 @@ class _DishOptionsScreenState extends State<DishOptionsScreen> {
                         ),
                         const SizedBox(height: 17),
                         ElevatedButton.icon(
-                          onPressed: _foodId != null ? _showPortionInputDialog : null, // Only allow showing dialog if foodId is set
+                          onPressed: _foodId != null ? _showPortionInputDialog : null,
                           icon: const Icon(Icons.edit),
                           label: const Text("Enter Portion"),
                           style: ElevatedButton.styleFrom(

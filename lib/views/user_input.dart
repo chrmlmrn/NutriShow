@@ -39,27 +39,33 @@ class _UserInputScreenState extends State<UserInputScreen> {
     "Active": "Physical activities equal to walking more than 3 miles per day at 3 to 4 miles per hour, in addition to the light activities of daily living",
   };
 
+  // Converts weight input based on unit toggle (kg <-> lbs)
   void _convertWeight() {
     if (_weightController.text.isNotEmpty) {
       double weight = double.tryParse(_weightController.text) ?? 0;
       if (_isKg) {
+        // If switching to kg, convert lbs to kg
         _weightController.text = (weight / 2.20462).toStringAsFixed(2);
       } else {
+        // If switching to lbs, convert kg to lbs
         _weightController.text = (weight * 2.20462).toStringAsFixed(2);
       }
     }
   }
 
+  // Converts height input based on unit toggle (cm <-> ft/in)
   void _convertHeight() {
     if (_isCm) {
+      // Convert ft/in to cm
       if (_heightFeetController.text.isNotEmpty || _heightInchesController.text.isNotEmpty) {
         int feet = int.tryParse(_heightFeetController.text) ?? 0;
         int inches = int.tryParse(_heightInchesController.text) ?? 0;
-        double totalInches = (feet * 12).toDouble() + inches; // Explicit conversion
+        double totalInches = (feet * 12).toDouble() + inches;
         double cm = totalInches * 2.54;
         _heightCmController.text = cm.toStringAsFixed(2);
       }
     } else {
+      // Convert cm to ft/in
       if (_heightCmController.text.isNotEmpty) {
         double cm = double.tryParse(_heightCmController.text) ?? 0;
         double totalInches = cm / 2.54;
@@ -85,39 +91,46 @@ class _UserInputScreenState extends State<UserInputScreen> {
     });
   }
 
+  // Called when the user taps the "Submit" button
   void _submitData() {
     final weightText = _weightController.text;
     double? heightCm;
 
+    // Convert height to cm if input is in ft/in
     if (_isCm) {
       heightCm = double.tryParse(_heightCmController.text);
     } else {
       int feet = int.tryParse(_heightFeetController.text) ?? 0;
       int inches = int.tryParse(_heightInchesController.text) ?? 0;
-      double totalInches = ((feet * 12) + inches).toDouble(); // Fixed!
+      double totalInches = ((feet * 12) + inches).toDouble();
       heightCm = totalInches * 2.54;
     }
 
+    // Check if all required fields are filled
     if (_ageController.text.isNotEmpty &&
         _selectedGender != null &&
         _selectedActivityLevel != null &&
         heightCm != null &&
         weightText.isNotEmpty) {
 
+      // Convert weight to kg if needed
       double weightKg = _isKg
           ? double.tryParse(weightText) ?? 0
           : (double.tryParse(weightText) ?? 0) / 2.20462;
 
       double heightMeters = heightCm / 100;
 
+      // Validate non-zero positive values
       if (heightMeters <= 0 || weightKg <= 0) {
         _showErrorDialog("Invalid height or weight values.");
         return;
       }
 
+      // Calculate BMI using formula: weight (kg) / height² (m²)
       double bmi = weightKg / (heightMeters * heightMeters);
       String category;
 
+      // Classify BMI range
       if (bmi < 18.5) {
         category = "Underweight";
       } else if (bmi < 25) {
@@ -128,6 +141,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
         category = "Obese";
       }
 
+      // Show result dialog with BMI and guidance
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -160,6 +174,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
         ),
       );
     } else {
+      // Alert if some inputs are missing
       _showErrorDialog("Please fill in all the fields to proceed.");
     }
   }
@@ -211,7 +226,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                       'NutriShow',
                       style: GoogleFonts.changaOne(
                         fontSize: 50,
-                        color: Color(0xFF0E4A06), // Adjust color to fit your theme
+                        color: Color(0xFF0E4A06),
                       ),
                     ),
                   ],
@@ -228,7 +243,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                 const SizedBox(height: 35),
                 TextField(
                   controller: _ageController,
-                  keyboardType: TextInputType.number, // Allows only numeric input
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Color(0xFFF9FEED),
@@ -300,12 +315,12 @@ class _UserInputScreenState extends State<UserInputScreen> {
                     ToggleButtons(
                       isSelected: [_isKg, !_isKg],
                       onPressed: _toggleWeightUnit,
-                      borderRadius: BorderRadius.circular(5), // Makes it rounder
-                      selectedBorderColor: Color(0xFF0E4A06), // Border color when selected
-                      borderColor: Color(0xFFAAD3C4), // Border color when unselected
-                      fillColor: Color(0xFFABCB4D), // Background color when selected
-                      selectedColor: Color(0xFF0E4A06), // Text color when selected
-                      color: Colors.black, // Text color when unselected
+                      borderRadius: BorderRadius.circular(5),
+                      selectedBorderColor: Color(0xFF0E4A06),
+                      borderColor: Color(0xFFAAD3C4),
+                      fillColor: Color(0xFFABCB4D),
+                      selectedColor: Color(0xFF0E4A06),
+                      color: Colors.black,
                       children: const [
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 12),
@@ -335,11 +350,11 @@ class _UserInputScreenState extends State<UserInputScreen> {
                           labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(5),
-                            borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
+                            borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(5),
-                            borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2), // Border when focused
+                            borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
                           ),
                         ),
                       )
@@ -356,11 +371,11 @@ class _UserInputScreenState extends State<UserInputScreen> {
                                 labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(5),
-                                  borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
+                                  borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(5),
-                                  borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2), // Border when focused
+                                  borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
                                 ),
                               ),
                             ),
@@ -377,11 +392,11 @@ class _UserInputScreenState extends State<UserInputScreen> {
                                 labelStyle: GoogleFonts.nunito(color: Color(0xFF0E4A06)),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(5),
-                                  borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2), // Unfocused border
+                                  borderSide: const BorderSide(color: Color(0xFFAAD3C4), width: 2),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(5),
-                                  borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2), // Border when focused
+                                  borderSide: const BorderSide(color: Color(0xFF809D3C), width: 2),
                                 ),
                               ),
                             ),
@@ -393,12 +408,12 @@ class _UserInputScreenState extends State<UserInputScreen> {
                     ToggleButtons(
                       isSelected: [_isCm, !_isCm],
                       onPressed: _toggleHeightUnit,
-                      borderRadius: BorderRadius.circular(5), // Makes it rounder
-                      selectedBorderColor: Color(0xFF0E4A06), // Border color when selected
-                      borderColor: Color(0xFFAAD3C4), // Border color when unselected
-                      fillColor: Color(0xFFABCB4D), // Background color when selected
-                      selectedColor: Color(0xFF0E4A06), // Text color when selected
-                      color: Colors.black, // Text color when unselected
+                      borderRadius: BorderRadius.circular(5),
+                      selectedBorderColor: Color(0xFF0E4A06),
+                      borderColor: Color(0xFFAAD3C4),
+                      fillColor: Color(0xFFABCB4D),
+                      selectedColor: Color(0xFF0E4A06),
+                      color: Colors.black,
                       children: const [
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 12),
@@ -421,8 +436,8 @@ class _UserInputScreenState extends State<UserInputScreen> {
                     return DropdownMenuItem(
                       value: entry.key,
                       child: ListTile(
-                        title: Text(entry.key), // Show only the title in the dropdown list
-                        subtitle: Text(entry.value), // Show subtitle inside the dropdown
+                        title: Text(entry.key),
+                        subtitle: Text(entry.value),
                       ),
                     );
                   }).toList(),
@@ -447,7 +462,7 @@ class _UserInputScreenState extends State<UserInputScreen> {
                   ),
                   selectedItemBuilder: (context) => _activityLevelsWithDescriptions.keys.map((title) {
                     return Text(
-                      title, // Only display the main title in the dropdown button (prevents overflow)
+                      title,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(fontSize: 16),
                     );

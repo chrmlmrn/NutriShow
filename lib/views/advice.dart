@@ -28,9 +28,10 @@ class MacronutrientAdvicePage extends StatelessWidget {
     required this.activityLevel,
   });
 
+  // Adjusts a given nutrient value based on the entered portion size
   double _adjustForPortion(dynamic value) {
     // Ensure the value is a double
-    double nutrientValue = double.tryParse(value.toString()) ?? 0.0; // Ensure it's a valid double
+    double nutrientValue = double.tryParse(value.toString()) ?? 0.0;
 
     // If portion size is "1" or valid, return the value as is
     if (portionSize == null || portionSize == "1") {
@@ -52,36 +53,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
     return nutrientValue * portionMultiplier;
   }
 
-  String? _getRecommendedKey(
-    String nutrient, String gender, String activity, Map<String, dynamic> row) {
-    final g = gender.toLowerCase().startsWith("m") ? "m" : "f";
-    final a = activity.toLowerCase().contains("sedentary")
-        ? "s"
-        : activity.toLowerCase().contains("moderately active")
-        ? "ma"
-        : "a";
-
-    final keys = [
-      "${nutrient}_${g}_${a}_min",
-      "${nutrient}_${g}_s_min",
-      "${nutrient}_${g}_ma_min",
-      "${nutrient}_${g}_a_min",
-      "${nutrient}_${g}_min",
-      "${nutrient}_min",
-      "${nutrient}_${g}_${a}_max",
-      "${nutrient}_${g}_s_max",
-      "${nutrient}_${g}_ma_max",
-      "${nutrient}_${g}_a_max",
-      "${nutrient}_${g}_max",
-      "${nutrient}_max",
-      "${nutrient}_${g}_${a}",
-      "${nutrient}_${g}",
-      nutrient,
-    ];
-
-    return keys.firstWhere((k) => row[k] != null, orElse: () => '');
-  }
-
+  // Generates advice text based on excess or lacking nutrients detected
   List<Widget> _buildPinnedAdvice() {
     final tooMuch = assessment?['too_much'] as List? ?? [];
     final lacking = assessment?['lacking'] as List? ?? [];
@@ -182,7 +154,6 @@ class MacronutrientAdvicePage extends StatelessWidget {
       pins.add("\uD83D\uDCCC ${fiberLack[rand.nextInt(5)]}");
     }
 
-
     return pins.map((msg) => Padding(
       padding: const EdgeInsets.only(bottom: 6.0),
       child: Text(
@@ -196,10 +167,12 @@ class MacronutrientAdvicePage extends StatelessWidget {
     )).toList();
   }
 
+  // Formats numeric values to two decimal places
   String _formatValue(num value) {
     return value.toStringAsFixed(2);
   }
 
+  // Shows a dialog listing recommended daily nutrient values based on user's demographics
   void _showRecommendedIntakeDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -225,37 +198,8 @@ class MacronutrientAdvicePage extends StatelessWidget {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    print("Activity Level received: $activityLevel");
-
-    final adjustedFoodDetails = {
-      for (final entry in foodDetails.entries)
-        entry.key: entry.value is num ? _adjustForPortion(entry.value) : entry.value,
-    };
-
-    final List<String> _dietTips = [
-      "Please make sure to cut the nutrient intake for those with too much and consume more for those lacking/less.",
-      "Make necessary dietary changes by limiting overconsumed nutrients and increasing those that are lacking.",
-      "Improve your nutrient balance by eating less of what’s excessive and more of what’s insufficient.",
-      "Moderate your nutrient levels—reduce excesses and supplement deficiencies accordingly.",
-      "Ensure proper nutrition by decreasing overconsumed nutrients and boosting underconsumed ones.",
-      "Regulate your diet by lowering excessive nutrients and increasing those in short supply.",
-      "Optimize your nutrient intake by consuming less of what’s excessive and more of what’s insufficient.",
-      "Maintain a healthy balance by reducing nutrients that exceed recommendations and increasing those that fall short.",
-      "Keep your nutrient intake in check by lowering what’s too much and adding what’s too little.",
-      "Ensure a well-rounded diet by consuming less of what you have too much of and more of what you need.",
-      "Correct imbalances in your diet by lowering high nutrient levels and raising low ones.",
-      "Manage your nutrition by reducing excessive intake and boosting nutrients that are below recommended levels.",
-      "Strive for a balanced diet by cutting down on overconsumed nutrients and replenishing deficiencies.",
-      "Adjust your food choices to decrease excess nutrients and increase those that are lacking.",
-      "Make dietary adjustments by limiting excess nutrients and incorporating more of the ones you’re missing.",
-    ];
-
-    final String finalTip = tip ?? _dietTips[Random().nextInt(_dietTips.length)];
-
     return Scaffold(
       backgroundColor: Color(0xFFF9FEEB),
       appBar: AppBar(
@@ -398,7 +342,6 @@ class MacronutrientAdvicePage extends StatelessWidget {
 
                                 final matches = RegExp(r"(-?\d+(\.\d+)?)").allMatches(item).toList();
 
-                                // If there are any numbers found in the string
                                 if (matches.isNotEmpty) {
                                   for (final match in matches) {
                                     final original = match.group(0)!;
@@ -432,7 +375,6 @@ class MacronutrientAdvicePage extends StatelessWidget {
 
                                 final matches = RegExp(r"(-?\d+(\.\d+)?)").allMatches(item).toList();
 
-                                // If there are any numbers found in the string
                                 if (matches.isNotEmpty) {
                                   for (final match in matches) {
                                     final original = match.group(0)!;
@@ -473,25 +415,6 @@ class MacronutrientAdvicePage extends StatelessWidget {
                   ),
                 ),
               const SizedBox(height: 20),
-              // if (recommendedIntake != null)
-              //   _buildRecommendedIntakeCard(
-              //     child: Column(
-              //       crossAxisAlignment: CrossAxisAlignment.start,
-              //       children: [
-              //         Text(
-              //           "🍽️ Recommended Nutrient Intake per Day",
-              //           style: GoogleFonts.poppins(
-              //             fontSize: 22,
-              //             fontWeight: FontWeight.bold,
-              //             color: Color(0xFF206C15),
-              //           ),
-              //         ),
-              //         const SizedBox(height: 10),
-              //         ..._buildRecommendedIntakeList(recommendedIntake!, activityLevel),
-              //       ],
-              //     ),
-              //   ),
-              const SizedBox(height: 22),
             ],
           ),
         ),
@@ -508,6 +431,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
 
   }
 
+  // Styled containers for separating the nutrition facts and dietary advice visually
   Widget _buildNutritionFactsCard({required Widget child, Color? color, Color borderColor = const Color(0xFFA9C46C)}) {
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -527,32 +451,13 @@ class MacronutrientAdvicePage extends StatelessWidget {
     );
   }
 
+  // Styled containers for separating the nutrition facts and dietary advice visually
   Widget _buildDietaryAdviceCard({required Widget child, Color? color, Color borderColor = const Color(0xFF23649e)}) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Color(0XFFCFE3DA),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderColor, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 5,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
-
-  Widget _buildRecommendedIntakeCard({required Widget child, Color? color, Color borderColor = const Color(0xFF206C15)}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Color(0XFFCAE0BC),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: borderColor, width: 2),
         boxShadow: [
@@ -588,6 +493,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
     );
   }
 
+  // Display the category label
   Widget _buildCategoryHeader(String title) {
     return Padding(
       padding: const EdgeInsets.only(top: 20.0, bottom: 8.0),
@@ -602,6 +508,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
     );
   }
 
+  // Displays a row of nutrient name and value (with optional styling for sub-categories)
   Widget _buildNutrientRow(String name, dynamic value, String unit) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
@@ -621,6 +528,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
     );
   }
 
+  // Displays a row of nutrient name and value (with optional styling for sub-categories)
   Widget _buildSubNutrient(String name, dynamic value, String unit) {
     return Padding(
       padding: const EdgeInsets.only(left: 20.0, bottom: 2.0),
@@ -640,6 +548,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
     );
   }
 
+  // Builds a list of Text widgets to display recommended nutrient ranges (min/max/alt) with fallback logic
   List<Widget> _buildRecommendedIntakeList(Map<String, dynamic> intake, String activityLevel) {
     final isMale = gender?.toLowerCase().startsWith('m') ?? true;
 
@@ -740,8 +649,7 @@ class MacronutrientAdvicePage extends StatelessWidget {
     return output;
   }
 
-
-
+  // Calculates total weight in grams by multiplying the portion size with serving size
   String _calculateTotalGrams() {
     final baseServing = double.tryParse(foodDetails['serving_size'].toString()) ?? 0;
     double multiplier = 1.0;
@@ -761,7 +669,6 @@ class MacronutrientAdvicePage extends StatelessWidget {
 
     double totalGrams = baseServing * multiplier;
 
-    // Format based on portion format
     bool showDecimal = false;
     if (portionSize != null) {
       if (portionSize!.contains(".") || portionSize!.contains("/")) {

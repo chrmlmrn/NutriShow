@@ -29,6 +29,8 @@ class FoodHistoryPage extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
+
+          // Load food history from the local database asynchronously
           FutureBuilder<List<Map<String, dynamic>>>(
             future: FoodHistory.getHistory(),
             builder: (context, snapshot) {
@@ -47,6 +49,7 @@ class FoodHistoryPage extends StatelessWidget {
 
               final history = snapshot.data!;
 
+              // Compute total nutrient values (adjusted by portion size) for pie chart visualization
               double totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
 
               for (var item in history) {
@@ -64,6 +67,7 @@ class FoodHistoryPage extends StatelessWidget {
                 totalFat += parseDouble(food['total_fat_g']) * portionSize;
               }
 
+              // Nutrient distribution chart sections (Protein, Carbs, Fat)
               final nutrientSections = [
                 PieChartSectionData(
                   value: totalProtein,
@@ -144,7 +148,8 @@ class FoodHistoryPage extends StatelessWidget {
                   SizedBox(
                     height: 250,
                     child: PieChart(
-                      PieChartData(
+                      // Macronutrient Pie Chart
+                    PieChartData(
                         sections: nutrientSections,
                         centerSpaceRadius: 0,
                         sectionsSpace: 4,
@@ -249,7 +254,8 @@ class FoodHistoryPage extends StatelessWidget {
                                   Text("Fat: ${formatValue(fat, item['portionSize']?.toString())} g", style: GoogleFonts.poppins(fontSize: 15)),
                                   const SizedBox(height: 8),
                                   Text(
-                                    "🕒 ${DateTime.tryParse(item['timestamp'] ?? '')?.toLocal().toString().split('.')[0] ?? 'Unknown time'}",
+                                    // Show local timestamp of when the food was logged
+                                  "🕒 ${DateTime.tryParse(item['timestamp'] ?? '')?.toLocal().toString().split('.')[0] ?? 'Unknown time'}",
                                     style: GoogleFonts.poppins(
                                       fontSize: 14,
                                       fontStyle: FontStyle.italic,

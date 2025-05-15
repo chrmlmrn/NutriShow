@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'package:nutrishow/views/user_input.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -9,10 +10,12 @@ class SplashScreen extends StatefulWidget {
   SplashScreenState createState() => SplashScreenState();
 }
 
+// State class for SplashScreen, handles UI and timer
 class SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+
     Future.delayed(const Duration(seconds: 6), () {
       if (mounted) {
         Navigator.pushReplacement(
@@ -30,22 +33,26 @@ class SplashScreenState extends State<SplashScreen> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/background.png', // Replace with your background image
+            'assets/background.png',
             fit: BoxFit.cover,
           ),
+
           Container(
-            color: Colors.black.withOpacity(0.2), // Optional overlay for contrast
+            color: Colors.black.withOpacity(0.2),
           ),
+
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // App logo image
                 Image.asset(
                   'assets/logo.png',
                   width: 150,
                   height: 150,
                 ),
                 const SizedBox(height: 20),
+
                 Text(
                   'NutriShow',
                   style: GoogleFonts.changaOne(
@@ -55,6 +62,7 @@ class SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
                 const SizedBox(height: 6),
+
                 Text(
                   'Image In, Insights Out: \nTrack your food without a doubt',
                   style: GoogleFonts.poppins(

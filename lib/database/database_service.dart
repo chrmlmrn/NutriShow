@@ -65,6 +65,8 @@ class DatabaseHelper {
     return result.isNotEmpty ? result.first : {};
   }
 
+  // Compares the food's nutrient values to user's recommended intake
+  // Uses portion size, gender, and activity level to determine lacking/too much
   Map<String, dynamic> assessDiet({
     required Map<String, dynamic> foodData,
     required Map<String, dynamic> recommendedRow,
@@ -180,6 +182,7 @@ class DatabaseHelper {
     };
   }
 
+  // Gets portion label (e.g., slice, cup) for a given food UID
   Future<String> queryPortionType(String foodId) async {
     final db = await database;
 
